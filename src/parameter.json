@@ -9,6 +9,6 @@
 	},
 	"mode": {
 		"mandatory": "false",
-		"values": "[fast|integrity]"
+		"values": "[fast|integrity|validate]"
 	}
 }

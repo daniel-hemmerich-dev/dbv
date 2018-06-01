@@ -62,11 +62,20 @@ class Version
 			if ('.' == $queryFile || '..' == $queryFile || is_dir($queryFile) || SELF::BACKUP == $queryFile) {
 				continue;
 			}
-			preg_match(
-				'/[' . Query::PREFIX . ']([0-9]+)_(.+)\.sql/mi',
+			if (!preg_match(
+				'/[' . Query::PREFIX . '](\d+)_(.+)\.sql/i',
 				$queryFile,
 				$matches
-			);
+			)) {
+				throw new \Exception(
+					'File: "'
+					. $queryFile
+					. '" does not match the requirements. Prefix must be: "'
+					. Query::PREFIX
+					. '" followed by a number and a "_".'
+					. "\n"
+				);
+			}
 			if (isset($this->queries[$matches[1]])) {
 				throw new \Exception(
 					'A query with the same id "' . $matches[1] . '"from file "' . $queryFile . '" already exist.'
@@ -235,7 +244,7 @@ class Version
 				$message   = '';
 				try {
 					$this->getDatabase()->query(
-						$backup['query'],
+						gzuncompress($backup['query']),
 						[]
 					);
 				} catch (\Exception $exception) {

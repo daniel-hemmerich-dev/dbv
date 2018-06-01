@@ -21,6 +21,7 @@ class Query
 	const STATUS_OK      = 'OK';
 	const STATUS_SKIPPED = 'SKIPPED';
 	const STATUS_FAILED  = 'FAILED';
+	const COMPRESSION    = 9;
 
 	/**
 	 * @var null
@@ -60,6 +61,8 @@ class Query
 		string $content
 	)
 	{
+		$database->validateQuery($content);
+
 		$this->setDatabase($database);
 		$this->setVersion($version);
 		$this->setName($name);
@@ -151,7 +154,10 @@ class Query
 				':version' => $this->getVersion(),
 				':name'    => $this->getName(),
 				':hash'    => md5($this->getContent()),
-				':query'   => $this->getContent(),
+				':query'   => gzcompress(
+					$this->getContent(),
+					self::COMPRESSION
+				),
 			]
 		);
 	}

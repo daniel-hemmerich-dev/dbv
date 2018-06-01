@@ -23,6 +23,7 @@ class Deploy
 	 */
 	const MODE_FAST      = 'fast';
 	const MODE_INTEGRITY = 'integrity';
+	const MODE_VALIDATE  = 'validate';
 
 	/**
 	 * @var int
@@ -170,12 +171,31 @@ class Deploy
 		if (!is_dir(__DIR__ . '/' . $config['changes']['src'])) {
 			throw new \Exception('Source "' . $config['changes']['src'] . '" for Database-Changes is invalid' . "\n");
 		}
+		foreach (scandir(__DIR__ . '/' . $config['changes']['src']) as $dir) {
+			if (!is_dir(__DIR__ . '/' . $config['changes']['src'] . '/' . $dir) || '.' == $dir || '..' == $dir) {
+				continue;
+			}
+			if (!preg_match(
+				'/^' . Version::PREFIX . '\d+$/',
+				$dir
+			)) {
+				throw new \Exception(
+					'Foldername: "'
+					. $dir
+					. '" does not start with the prefix: "'
+					. Version::PREFIX
+					. '" and ends with a number.'
+					. "\n"
+				);
+			}
+		}
 		$this->setPath(__DIR__ . '/' . $config['changes']['src']);
 
 		if (isset($config['prescript'])) {
 			if (!file_exists(__DIR__ . '/' . $config['prescript'])) {
 				throw new \Exception('Prescript-File: "' . $config['prescript'] . '" does not exist.' . "\n");
 			}
+			$this->getDatabase()->validateQuery(file_get_contents(__DIR__ . '/' . $config['prescript']));
 			$this->setPreScript(__DIR__ . '/' . $config['prescript']);
 		}
 
@@ -183,6 +203,7 @@ class Deploy
 			if (!file_exists(__DIR__ . '/' . $config['postscript'])) {
 				throw new \Exception('Postscript-File: "' . $config['postscript'] . '" does not exist.' . "\n");
 			}
+			$this->getDatabase()->validateQuery(file_get_contents(__DIR__ . '/' . $config['postscript']));
 			$this->setPostScript(__DIR__ . '/' . $config['postscript']);
 		}
 
@@ -311,6 +332,14 @@ class Deploy
 				. $deployVersion
 				. '".'
 			);
+		}
+
+		if (self::MODE_VALIDATE == $mode) {
+			new Version(
+				$this->getPath(), $deployVersion, $this->getDatabase()
+			);
+
+			return true;
 		}
 
 		if ('' != $this->getPreScript()) {

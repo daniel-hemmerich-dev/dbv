@@ -261,6 +261,14 @@ class Database
 
 	/**
 	 * @param string $query
+	 */
+	public function validateQuery(string $query)
+	{
+		$this->pdo->prepare($query);
+	}
+
+	/**
+	 * @param string $query
 	 * @param array $parameter
 	 *
 	 * @return null

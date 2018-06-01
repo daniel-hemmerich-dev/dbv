@@ -3,6 +3,6 @@ CREATE TABLE IF NOT EXISTS `dbv_queries` (
   `name` varchar(128) NOT NULL DEFAULT '',
   `datetime` datetime NOT NULL,
   `hash` varchar(32) DEFAULT NULL,
-  `query` longtext NOT NULL,
+  `query` longblob NOT NULL,
   PRIMARY KEY (`version`,`name`,`hash`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

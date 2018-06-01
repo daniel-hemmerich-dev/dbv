@@ -11,7 +11,7 @@
  * you should start with your changes in the /database/v1 folder
  *
  * ToDo
- * add pre- and post-sql statements to execute before and after deployment
+ * the fast-option makes a copy of the tables to update and update the copy and after that rename and delete the old tables
  */
 
 

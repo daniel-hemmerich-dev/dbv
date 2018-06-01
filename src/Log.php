@@ -8,8 +8,6 @@
 
 namespace dbv;
 
-use Seld\JsonLint\DuplicateKeyException;
-
 /**
  * Class Log
  *
