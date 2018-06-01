@@ -18,13 +18,11 @@ require_once __DIR__ . '/Version.php';
  */
 class Deploy
 {
+	/**
+	 * Constants
+	 */
 	const MODE_FAST      = 'fast';
 	const MODE_INTEGRITY = 'integrity';
-
-	/**
-	 * @var array
-	 */
-	protected $config = [];
 
 	/**
 	 * @var int
@@ -34,17 +32,101 @@ class Deploy
 	/**
 	 * @var int
 	 */
-	protected $highestPossibleVersion = 1;
+	protected $highestPossibleVersion = 0;
 
 	/**
 	 * @var int
 	 */
-	protected $highestVersion = 1;
+	protected $highestVersion = 0;
 
 	/**
 	 * @var null
 	 */
 	protected $database = null;
+
+	/**
+	 * @var string
+	 */
+	protected $path = '';
+
+	/**
+	 * @var string
+	 */
+	protected $preScript = '';
+
+	/**
+	 * @var string
+	 */
+	protected $postScript = '';
+
+	/**
+	 * @var bool
+	 */
+	protected $compression = false;
+
+	/**
+	 * @return string
+	 */
+	public function getPath(): string
+	{
+		return $this->path;
+	}
+
+	/**
+	 * @param string $path
+	 */
+	public function setPath(string $path): void
+	{
+		$this->path = $path;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getPreScript(): string
+	{
+		return $this->preScript;
+	}
+
+	/**
+	 * @param string $preScript
+	 */
+	public function setPreScript(string $preScript): void
+	{
+		$this->preScript = $preScript;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getPostScript(): string
+	{
+		return $this->postScript;
+	}
+
+	/**
+	 * @param string $postScript
+	 */
+	public function setPostScript(string $postScript): void
+	{
+		$this->postScript = $postScript;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isCompression(): bool
+	{
+		return $this->compression;
+	}
+
+	/**
+	 * @param bool $compression
+	 */
+	public function setCompression(bool $compression): void
+	{
+		$this->compression = $compression;
+	}
 
 	/**
 	 * Deploy constructor.
@@ -66,10 +148,13 @@ class Deploy
 			throw new \Exception('Invalid JSON in File: "' . $configPath . '".');
 		}
 
-		$this->setConfig(
-			$config
-		);
-
+		if (!isset($config['database'])
+			|| !isset($config['database']['host'])
+			|| !isset($config['database']['user'])
+			|| !isset($config['database']['password'])
+			|| !isset($config['database']['database'])) {
+			throw new \Exception('No Database-Credentials specified in the Config-file.' . "\n");
+		}
 		$database = new Database(
 			Database::TYPE_MYSQL,
 			$config['database']['host'],
@@ -78,6 +163,28 @@ class Deploy
 			$config['database']['database']
 		);
 		$this->setDatabase($database);
+
+		if (!isset($config['changes']) || !isset($config['changes']['src'])) {
+			throw new \Exception('No Source for Database-Changes specified in the Config-file.' . "\n");
+		}
+		if (!is_dir(__DIR__ . '/' . $config['changes']['src'])) {
+			throw new \Exception('Source "' . $config['changes']['src'] . '" for Database-Changes is invalid' . "\n");
+		}
+		$this->setPath(__DIR__ . '/' . $config['changes']['src']);
+
+		if (isset($config['prescript'])) {
+			if (!file_exists(__DIR__ . '/' . $config['prescript'])) {
+				throw new \Exception('Prescript-File: "' . $config['prescript'] . '" does not exist.' . "\n");
+			}
+			$this->setPreScript(__DIR__ . '/' . $config['prescript']);
+		}
+
+		if (isset($config['postscript'])) {
+			if (!file_exists(__DIR__ . '/' . $config['postscript'])) {
+				throw new \Exception('Postscript-File: "' . $config['postscript'] . '" does not exist.' . "\n");
+			}
+			$this->setPostScript(__DIR__ . '/' . $config['postscript']);
+		}
 
 		$this->init();
 
@@ -92,7 +199,7 @@ class Deploy
 	protected function selectHighestPossibleVersion(): int
 	{
 		$highestPossibleVersion = 0;
-		$path                   = __DIR__ . '/' . $this->config['changes']['src'];
+		$path                   = $this->getPath();
 		foreach (scandir($path) as $content) {
 			if (!is_dir($path . '/' . $content)) {
 				continue;
@@ -206,7 +313,15 @@ class Deploy
 			);
 		}
 
-		echo('Deploying version: ' . $deployVersion . "\n");
+		if ('' != $this->getPreScript()) {
+			echo('Executing prescript: "' . str_replace(__DIR__ . '/', '', $this->getPreScript()) . '" ' . "\n");
+			$this->getDatabase()->query(
+				file_get_contents($this->getPreScript()),
+				[]
+			);
+		}
+
+		echo('Deploying version: "' . $deployVersion . '"' . "\n");
 		$deployed = false;
 		if ($deployVersion == $this->getCurrentVersion()) {
 			$deployed = $this->deploySameVersion($deployVersion);
@@ -220,6 +335,13 @@ class Deploy
 		}
 
 		if ($deployed) {
+			if ('' != $this->getPostScript()) {
+				echo('Executing postscript: "' . str_replace(__DIR__ . '/', '', $this->getPostScript()) . '" ' . "\n");
+				$this->getDatabase()->query(
+					file_get_contents($this->getPostScript()),
+					[]
+				);
+			}
 			$this->insertState(
 				'current_version',
 				$deployVersion
@@ -292,7 +414,7 @@ class Deploy
 	protected function deploySameVersion(int $deployVersion): bool
 	{
 		$version = new Version(
-			$this->config['changes']['src'], $deployVersion, $this->getDatabase()
+			$this->getPath(), $deployVersion, $this->getDatabase()
 		);
 
 		return $version->deploy();
@@ -310,7 +432,7 @@ class Deploy
 	{
 		for ($executeVersion = $this->getCurrentVersion(); $executeVersion > $deployVersion; $executeVersion--) {
 			$version = new Version(
-				$this->config['changes']['src'], $executeVersion, $this->getDatabase()
+				$this->getPath(), $executeVersion, $this->getDatabase()
 			);
 			if (!$version->rollback()) {
 				return false;
@@ -338,7 +460,7 @@ class Deploy
 			for ($executeVersion = $this->getCurrentVersion() + 2; $executeVersion <= $deployVersion; $executeVersion++)
 			{
 				$version = new Version(
-					$this->config['changes']['src'], $executeVersion, $this->getDatabase()
+					$this->getPath(), $executeVersion, $this->getDatabase()
 				);
 				if(!$version->rollback()) {
 					return false;
@@ -354,7 +476,7 @@ class Deploy
 
 		for ($executeVersion = $this->getCurrentVersion() + 1; $executeVersion <= $deployVersion; $executeVersion++) {
 			$version = new Version(
-				$this->config['changes']['src'], $executeVersion, $this->getDatabase()
+				$this->getPath(), $executeVersion, $this->getDatabase()
 			);
 			if (!$version->deploy()) {
 				return false;
@@ -362,21 +484,5 @@ class Deploy
 		}
 
 		return true;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getConfig(): array
-	{
-		return $this->config;
-	}
-
-	/**
-	 * @param array $config
-	 */
-	public function setConfig(array $config): void
-	{
-		$this->config = $config;
 	}
 }

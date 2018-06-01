@@ -67,14 +67,14 @@ class Query
 
 		$matches = [];
 		preg_match_all(
-			'/^[CREATE TABLE IF NOT EXISTS |CREATE TABLE |DROP TABLE IF EXISTS |DROP TABLE |INSERT IGNORE INTO |INSERT INTO |INSERT |UPDATE |FROM |JOIN ]+[^`a-zA-Z0-9]*([`a-zA-Z0-9]+)/im',
+			'/\b(CREATE TABLE IF NOT EXISTS|CREATE TABLE|DROP TABLE IF EXISTS|DROP TABLE|INSERT IGNORE INTO|INSERT INTO|INSERT|UPDATE|SELECT .* FROM|JOIN)\s+([`]*[a-zA-Z0-9_$]+[`]*)/im',
 			$this->getContent(),
 			$matches
 		);
-		if (0 == count($matches)) {
+		if (!isset($matches[2]) || 0 == count($matches[2])) {
 			throw new \Exception('No Tables matched on "' . $this->getName() . '"');
 		}
-		$this->setTables($matches[1]);
+		$this->setTables($matches[2]);
 	}
 
 	/**

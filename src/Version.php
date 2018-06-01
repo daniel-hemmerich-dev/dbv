@@ -83,7 +83,7 @@ class Version
 	 */
 	protected function getFullpath()
 	{
-		return __DIR__ . '/' . $this->getPath() . self::PREFIX . $this->getVersion() . '/';
+		return $this->getPath() . self::PREFIX . $this->getVersion() . '/';
 	}
 
 	/**

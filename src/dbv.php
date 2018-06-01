@@ -11,7 +11,7 @@
  * you should start with your changes in the /database/v1 folder
  *
  * ToDo
- * Make Execution-Time in dbv_log a float
+ * add pre- and post-sql statements to execute before and after deployment
  */
 
 

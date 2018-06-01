@@ -8,5 +8,5 @@ LOCK TABLES `dbv_state` WRITE;
 INSERT IGNORE INTO `dbv_state` (`name`, `value`)
 VALUES
 	('current_version', '0'),
-	('highest_version', '1');
+	('highest_version', '0');
 UNLOCK TABLES;

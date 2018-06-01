@@ -11,5 +11,8 @@
 		"database": "dbv",
 		"user": "root",
 		"password": "root"
-	}
+	},
+	"prescript": "../data/prescript.sql",
+	"postscript": "../data/postscript.sql",
+	"compression": "false"
 }
