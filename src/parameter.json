@@ -1,14 +1,17 @@
 {
 	"config": {
 		"mandatory": "true",
-		"values": ".+"
+		"values": ".+",
+		"description": "Indicate the Path to the Config-File to load, which contains the Deployment-Options."
 	},
 	"version": {
 		"mandatory": "false",
-		"values": "[1-9]+[0-9]*"
+		"values": "[1-9][0-9]*",
+		"description": "Indicates the Version to Deploy."
 	},
 	"mode": {
 		"mandatory": "false",
-		"values": "[fast|integrity|validate]"
+		"values": "[fast|integrity|validate]",
+		"description": "Indicates the Deployment-Mode to use.\n\t- Fast = Use Backups instead of the newest available Data.\n\t- Integrity = Use the newest Data.\n\t- Validate = Make a Validation-Run only. No Changes will be executed."
 	}
 }

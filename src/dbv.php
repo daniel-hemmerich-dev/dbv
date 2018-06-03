@@ -7,13 +7,12 @@
  */
 
 /*
- * no other database-changes should exist in the /database/v0 folder
- * you should start with your changes in the /database/v1 folder
- *
  * ToDo
+ *
  * the fast-option makes a copy of the tables to update and update the copy and after that rename and delete the old tables
+ * it first makes the changes on all copies and if no errors rename them at the end and delete the originals
+ * in case of error delete the copies and keep the originals
  */
-
 
 // setup
 error_reporting(E_ALL);
@@ -28,6 +27,22 @@ $validateParameter = json_decode(
 
 // validate arguments
 foreach ($argv as $arg) {
+	// help
+	if (preg_match(
+		'/(-h|--help)/i',
+		$arg
+	)) {
+		$helpText = 'Usage: "php dbv.php {argument-name=argument-value}". '
+			. "\nThe following Arguments are supprted (case-insensitive):\n";
+		foreach ($validateParameter as $sKey => $validParameter) {
+			$helpText .= 'Name: ' . $sKey . "\n";
+			$helpText .= 'Values: ' . $validParameter['values'] . "\n";
+			$helpText .= 'Mandatory: ' . $validParameter['mandatory'] . "\n";
+			$helpText .= 'Description: ' . $validParameter['description'] . "\n\n";
+		}
+		exit($helpText);
+	}
+
 	preg_match(
 		'/(.+)=(.+)/mi',
 		$arg,
