@@ -7,7 +7,7 @@ CREATE TABLE `dbv_log` (
   `message` longtext NOT NULL,
   `execution_time` float unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 LOCK TABLES `dbv_log` WRITE;
 INSERT IGNORE INTO `dbv_log` (`datetime`, `version`, `name`, `status`, `message`, `execution_time`)
