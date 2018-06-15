@@ -169,7 +169,9 @@ class Deploy
 			throw new \Exception('No Source for Database-Changes specified in the Config-file.' . "\n");
 		}
 		if (!is_dir(__DIR__ . '/' . $config['changes']['src'])) {
-			throw new \Exception('Source "' . $config['changes']['src'] . '" for Database-Changes is invalid' . "\n");
+			throw new \Exception(
+				'Source "' . __DIR__ . '/' . $config['changes']['src'] . '" for Database-Changes is invalid' . "\n"
+			);
 		}
 		foreach (scandir(__DIR__ . '/' . $config['changes']['src']) as $dir) {
 			if (!is_dir(__DIR__ . '/' . $config['changes']['src'] . '/' . $dir) || '.' == $dir || '..' == $dir) {

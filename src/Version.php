@@ -59,7 +59,7 @@ class Version
 
 		$matches = [];
 		foreach (scandir($this->getFullpath()) as $queryFile) {
-			if ('.' == $queryFile || '..' == $queryFile || is_dir($queryFile) || SELF::BACKUP == $queryFile) {
+			if ('.' == substr($queryFile, 0, 1) || is_dir($queryFile) || SELF::BACKUP == $queryFile) {
 				continue;
 			}
 			if (!preg_match(

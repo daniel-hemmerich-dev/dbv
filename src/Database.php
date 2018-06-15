@@ -73,6 +73,11 @@ class Database
 				\PDO::ATTR_EMULATE_PREPARES => true,
 			]
 		);
+
+		$pdo->query('SET SESSION lock_wait_timeout = 31536000');
+		$pdo->query('SET SESSION interactive_timeout = 28800');
+		$pdo->query('SET SESSION wait_timeout = 28800');
+
 		$this->setPdo($pdo);
 		$this->setType($type);
 		$this->setHost($host);
