@@ -14,7 +14,6 @@
  * in case of error delete the copies and keep the originals
  */
 
-
 try {
 	// setup
 	error_reporting(E_ALL);
@@ -94,13 +93,15 @@ try {
 		$arguments['config']
 	);
 
-	return $deploy->deploy(
+	if (!$deploy->deploy(
 		$arguments['version'] ?? $deploy->getHighestPossibleVersion(),
 		$arguments['mode'] ?? \dbv\Deploy::MODE_INTEGRITY
 
-	);
+	)) {
+		throw new Exception('Deployment failed!');
+	}
 } catch (Exception $exception) {
 	echo($exception);
-
-	return 42;
+	exit(42);
 }
+exit(0);
