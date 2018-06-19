@@ -76,7 +76,7 @@ class Deploy
 	/**
 	 * @param string $path
 	 */
-	public function setPath(string $path): void
+	public function setPath(string $path)//: void
 	{
 		$this->path = $path;
 	}
@@ -92,7 +92,7 @@ class Deploy
 	/**
 	 * @param string $preScript
 	 */
-	public function setPreScript(string $preScript): void
+	public function setPreScript(string $preScript)//: void
 	{
 		$this->preScript = $preScript;
 	}
@@ -108,7 +108,7 @@ class Deploy
 	/**
 	 * @param string $postScript
 	 */
-	public function setPostScript(string $postScript): void
+	public function setPostScript(string $postScript)//: void
 	{
 		$this->postScript = $postScript;
 	}
@@ -124,7 +124,7 @@ class Deploy
 	/**
 	 * @param bool $compression
 	 */
-	public function setCompression(bool $compression): void
+	public function setCompression(bool $compression)//: void
 	{
 		$this->compression = $compression;
 	}
@@ -289,7 +289,7 @@ class Deploy
 	/**
 	 * @param null $database
 	 */
-	public function setDatabase(Database $database): void
+	public function setDatabase(Database $database)//: void
 	{
 		$this->database = $database;
 	}
@@ -397,7 +397,7 @@ class Deploy
 	/**
 	 * @param int $highestVersion
 	 */
-	public function setHighestVersion(int $highestVersion): void
+	public function setHighestVersion(int $highestVersion)//: void
 	{
 		$this->highestVersion = $highestVersion;
 	}
@@ -413,7 +413,7 @@ class Deploy
 	/**
 	 * @param int $highestPossibleVersion
 	 */
-	public function setHighestPossibleVersion(int $highestPossibleVersion): void
+	public function setHighestPossibleVersion(int $highestPossibleVersion)//: void
 	{
 		$this->highestPossibleVersion = $highestPossibleVersion;
 	}
@@ -429,7 +429,7 @@ class Deploy
 	/**
 	 * @param int $currentVersion
 	 */
-	public function setCurrentVersion(int $currentVersion): void
+	public function setCurrentVersion(int $currentVersion)//: void
 	{
 		$this->currentVersion = $currentVersion;
 	}
