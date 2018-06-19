@@ -9,6 +9,8 @@
 /*
  * ToDo
  *
+ * add parallelization
+ *
  * the fast-option makes a copy of the tables to update and update the copy and after that rename and delete the old tables
  * it first makes the changes on all copies and if no errors rename them at the end and delete the originals
  * in case of error delete the copies and keep the originals
