@@ -142,8 +142,8 @@ class Version
 
 		try {
 			foreach ($this->getQueries() as $query) {
-				if(!$query->execute()) {
-					throw new \Exception("Error during query-execution.");
+				if (!$query->execute()) {
+					throw new \Exception("Error during query-execution.\n");
 				}
 			}
 
