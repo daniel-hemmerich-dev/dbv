@@ -106,7 +106,7 @@ class Version
 	/**
 	 * @param string $path
 	 */
-	public function setPath(string $path): void
+	public function setPath(string $path)//: void
 	{
 		$this->path = $path;
 	}
@@ -122,7 +122,7 @@ class Version
 	/**
 	 * @param int $version
 	 */
-	public function setVersion(int $version): void
+	public function setVersion(int $version)//: void
 	{
 		$this->version = $version;
 	}
@@ -142,7 +142,9 @@ class Version
 
 		try {
 			foreach ($this->getQueries() as $query) {
-				$query->execute();
+				if(!$query->execute()) {
+					throw new \Exception("Error during query-execution.");
+				}
 			}
 
 			return true;
@@ -201,7 +203,7 @@ class Version
 	/**
 	 * @param mixed $database
 	 */
-	public function setDatabase(Database $database): void
+	public function setDatabase(Database $database)//: void
 	{
 		$this->database = $database;
 	}
@@ -217,7 +219,7 @@ class Version
 	/**
 	 * @param array $queries
 	 */
-	public function setQueries(array $queries): void
+	public function setQueries(array $queries)//: void
 	{
 		$this->queries = $queries;
 	}

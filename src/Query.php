@@ -91,7 +91,7 @@ class Query
 	/**
 	 * @param string $content
 	 */
-	public function setContent(string $content): void
+	public function setContent(string $content)//: void
 	{
 		$this->content = $content;
 	}
@@ -107,7 +107,7 @@ class Query
 	/**
 	 * @param array $tables
 	 */
-	public function setTables(array $tables): void
+	public function setTables(array $tables)//: void
 	{
 		foreach ($tables as $table) {
 			$this->tables[] = str_replace(
@@ -211,7 +211,7 @@ class Query
 	/**
 	 * @param null $database
 	 */
-	public function setDatabase($database): void
+	public function setDatabase($database)//: void
 	{
 		$this->database = $database;
 	}
@@ -227,7 +227,7 @@ class Query
 	/**
 	 * @param int $version
 	 */
-	public function setVersion(int $version): void
+	public function setVersion(int $version)//: void
 	{
 		$this->version = $version;
 	}
@@ -243,7 +243,7 @@ class Query
 	/**
 	 * @param string $name
 	 */
-	public function setName(string $name): void
+	public function setName(string $name)//: void
 	{
 		$this->name = $name;
 	}

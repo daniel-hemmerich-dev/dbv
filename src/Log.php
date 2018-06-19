@@ -59,7 +59,7 @@ class Log
 	/**
 	 * @param null $database
 	 */
-	public function setDatabase(Database $database): void
+	public function setDatabase(Database $database)//: void
 	{
 		$this->database = $database;
 	}

@@ -97,7 +97,7 @@ class Database
 	/**
 	 * @param null $pdo
 	 */
-	public function setPdo(\PDO $pdo): void
+	public function setPdo(\PDO $pdo)//: void
 	{
 		$this->pdo = $pdo;
 	}
@@ -113,7 +113,7 @@ class Database
 	/**
 	 * @param string $type
 	 */
-	public function setType(string $type): void
+	public function setType(string $type)//: void
 	{
 		$this->type = $type;
 	}
@@ -129,7 +129,7 @@ class Database
 	/**
 	 * @param string $host
 	 */
-	public function setHost(string $host): void
+	public function setHost(string $host)//: void
 	{
 		$this->host = $host;
 	}
@@ -145,7 +145,7 @@ class Database
 	/**
 	 * @param string $user
 	 */
-	public function setUser(string $user): void
+	public function setUser(string $user)//: void
 	{
 		$this->user = $user;
 	}
@@ -161,7 +161,7 @@ class Database
 	/**
 	 * @param string $password
 	 */
-	public function setPassword(string $password): void
+	public function setPassword(string $password)//: void
 	{
 		$this->password = $password;
 	}
@@ -304,7 +304,7 @@ class Database
 	/**
 	 * @param string $name
 	 */
-	public function setName(string $name): void
+	public function setName(string $name)//: void
 	{
 		$this->name = $name;
 	}
