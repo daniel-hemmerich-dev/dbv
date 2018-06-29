@@ -56,17 +56,26 @@ class Database
 	 * @param string $user
 	 * @param string $password
 	 * @param string $name
+	 * @param string $charset
 	 */
 	public function __construct(
 		string $type,
 		string $host,
 		string $user,
 		string $password,
-		string $name
+		string $name,
+		string $charset
 	)
 	{
+		$connection = $type . ':';
+		$connection .= 'host=' . $host . ';';
+		$connection .= 'charset=' . $charset . ';';
+		if ('' != $name) {
+			$connection .= 'dbname=' . $name . ';';
+		}
+
 		$pdo = new \PDO(
-			$type . ':dbname=' . $name . ';host=' . $host, $user, $password, [
+			$connection, $user, $password, [
 				\PDO::ATTR_ERRMODE          => \PDO::ERRMODE_EXCEPTION,
 				\PDO::ATTR_CASE             => \PDO::CASE_NATURAL,
 				\PDO::ATTR_ORACLE_NULLS     => \PDO::NULL_EMPTY_STRING,

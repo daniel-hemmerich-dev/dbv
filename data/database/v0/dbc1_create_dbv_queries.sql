@@ -1,3 +1,5 @@
+CREATE DATABASE `dbv`;
+
 CREATE TABLE IF NOT EXISTS `dbv_queries` (
   `version` bigint(20) unsigned NOT NULL,
   `name` varchar(128) NOT NULL DEFAULT '',

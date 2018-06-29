@@ -153,15 +153,15 @@ class Deploy
 			|| !isset($config['database']['host'])
 			|| !isset($config['database']['user'])
 			|| !isset($config['database']['password'])
-			|| !isset($config['database']['database'])) {
+			|| !isset($config['database']['database'])
+			|| !isset($config['database']['charset'])) {
 			throw new \Exception('No Database-Credentials specified in the Config-file.' . "\n");
 		}
 		$database = new Database(
 			Database::TYPE_MYSQL,
 			$config['database']['host'],
 			$config['database']['user'],
-			$config['database']['password'],
-			$config['database']['database']
+			$config['database']['password'], $config['database']['database'], $config['database']['charset']
 		);
 		$this->setDatabase($database);
 
