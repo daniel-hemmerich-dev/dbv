@@ -176,6 +176,112 @@ class Database
 	}
 
 	/**
+	 * @param Database $syncFrom
+	 * @param array $tableWhitelist
+	 */
+	public function synchronize(
+		Database $syncFrom,
+		array $tableWhitelist
+	)
+	{
+		echo("Synchronization\n");
+		$tables = $this->query(
+			'SELECT table_name FROM information_schema.tables where table_schema=:database',
+			['database' => $this->getName()]
+		);
+
+		foreach ($tables as $table) {
+			if (!in_array(
+				$table['table_name'],
+				$tableWhitelist
+			)) {
+				echo('Table: "' . $table['table_name'] . '" skipped during synchronization' . "\n");
+				continue;
+			}
+
+			echo('Synchronizing table: ' . $table['table_name'] . "\n");
+
+			$columnsTo = $this->query(
+				'SELECT column_name FROM information_schema.columns WHERE table_schema=:database AND table_name=:table',
+				[
+					'database' => $this->getName(),
+					'table'    => $table['table_name'],
+				]
+			);
+
+			try {
+				$columnsFrom = $syncFrom->query(
+					'SELECT column_name FROM information_schema.columns WHERE table_schema=:database AND table_name=:table',
+					[
+						'database' => $syncFrom->getName(),
+						'table'    => $table['table_name'],
+					]
+				);
+			} catch (\Exception $exception) {
+				echo $exception;
+				continue;
+			}
+
+			// diff = to > from
+			$intersect       = array_intersect(
+				array_column($columnsTo, 'column_name'),
+				array_column($columnsFrom, 'column_name')
+			);
+			$intersectString = implode(
+				',',
+				$intersect
+			);
+
+			// truncate table
+			$this->query(
+				'TRUNCATE ' . $table['table_name'],
+				[]
+			);
+
+			// get results to sync from
+			$results      = $syncFrom->query(
+				'SELECT ' . $intersectString . ' FROM ' . $table['table_name'],
+				[]
+			);
+			$resultChunks = array_chunk(
+				$results,
+				self::DUMP_SPLIT,
+				true
+			);
+
+			// insert the intersect between the from and to tables
+			foreach ($resultChunks as $chunk) {
+				$insertTable = "INSERT IGNORE INTO `"
+					. $table['table_name']
+					. "` ("
+					. implode(', ', array_keys($results[0]))
+					. ") \nVALUES";
+				foreach ($chunk as $row) {
+					$insertTable .= "\n(";
+					foreach ($row as $value) {
+						$insertTable .= "'" . $value . "',";
+					}
+					$insertTable = substr(
+						$insertTable,
+						0,
+						-1
+					);
+					$insertTable .= "),";
+				}
+				$insertTable = substr_replace(
+					$insertTable,
+					';',
+					-1
+				);
+				$this->query(
+					$insertTable,
+					[]
+				);
+			}
+		}
+	}
+
+	/**
 	 * @param string $file
 	 * @param array $tableWhitelist
 	 */

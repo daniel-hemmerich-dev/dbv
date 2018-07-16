@@ -46,6 +46,11 @@ class Deploy
 	protected $database = null;
 
 	/**
+	 * @var null
+	 */
+	protected $databaseSync = null;
+
+	/**
 	 * @var string
 	 */
 	protected $path = '';
@@ -56,6 +61,22 @@ class Deploy
 	protected $preScript = '';
 
 	/**
+	 * @return array
+	 */
+	public function getWhitelistSync(): array
+	{
+		return $this->whitelistSync;
+	}
+
+	/**
+	 * @param array $whitelistSync
+	 */
+	public function setWhitelistSync(array $whitelistSync): void
+	{
+		$this->whitelistSync = $whitelistSync;
+	}
+
+	/**
 	 * @var string
 	 */
 	protected $postScript = '';
@@ -64,6 +85,11 @@ class Deploy
 	 * @var bool
 	 */
 	protected $compression = false;
+
+	/**
+	 * @var array
+	 */
+	protected $whitelistSync = [];
 
 	/**
 	 * @return string
@@ -193,6 +219,31 @@ class Deploy
 		}
 		$this->setPath(__DIR__ . '/' . $config['changes']['src']);
 
+		if (isset($config['synchronization'])) {
+			$synchronization = $config['synchronization'];
+			if (!isset($synchronization['database'])
+				|| !isset($synchronization['database']['host'])
+				|| !isset($synchronization['database']['user'])
+				|| !isset($synchronization['database']['password'])
+				|| !isset($synchronization['database']['database'])
+				|| !isset($synchronization['database']['charset'])) {
+				throw new \Exception('No Database-Credentials specified in the Config-file.' . "\n");
+			}
+			$databaseSync = new Database(
+				Database::TYPE_MYSQL,
+				$synchronization['database']['host'],
+				$synchronization['database']['user'],
+				$synchronization['database']['password'],
+				$synchronization['database']['database'],
+				$synchronization['database']['charset']
+			);
+			$this->setDatabaseSync($databaseSync);
+
+			if (isset($synchronization['whitelist'])) {
+				$this->setWhitelistSync($synchronization['whitelist']);
+			}
+		}
+
 		if (isset($config['prescript'])) {
 			if (!file_exists(__DIR__ . '/' . $config['prescript'])) {
 				throw new \Exception('Prescript-File: "' . $config['prescript'] . '" does not exist.' . "\n");
@@ -269,7 +320,7 @@ class Deploy
 			 * execute the v0-folder queries
 			 * recursive-call of init
 			 */
-			echo('FirstTime initializiation. Ignore Errors and Warnings. :)' . "\n");
+			echo('FirstTime initializiation.' . "\n");
 			$this->deploy(
 				0,
 				self::MODE_INTEGRITY
@@ -292,6 +343,22 @@ class Deploy
 	public function setDatabase(Database $database)//: void
 	{
 		$this->database = $database;
+	}
+
+	/**
+	 * @return null
+	 */
+	public function getDatabaseSync()
+	{
+		return $this->databaseSync;
+	}
+
+	/**
+	 * @param null $databaseSync
+	 */
+	public function setDatabaseSync($databaseSync): void
+	{
+		$this->databaseSync = $databaseSync;
 	}
 
 	/**
@@ -366,6 +433,13 @@ class Deploy
 		}
 
 		if ($deployed) {
+			if ($this->getDatabaseSync()) {
+				$this->getDatabase()->synchronize(
+					$this->getDatabaseSync(),
+					$this->getWhitelistSync()
+				);
+			}
+
 			if ('' != $this->getPostScript()) {
 				echo('Executing postscript: "' . str_replace(__DIR__ . '/', '', $this->getPostScript()) . '" ' . "\n");
 				$this->getDatabase()->query(

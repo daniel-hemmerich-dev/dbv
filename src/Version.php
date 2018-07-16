@@ -133,7 +133,9 @@ class Version
 	public function deploy(): bool
 	{
 		try {
-			$this->backup();
+			if (0 != $this->getVersion()) {
+				$this->backup();
+			}
 		} catch (\Exception $exception) {
 			echo($exception);
 
@@ -143,7 +145,7 @@ class Version
 		try {
 			foreach ($this->getQueries() as $query) {
 				if (!$query->execute()) {
-					throw new \Exception("Error during query-execution.\n");
+					throw new \Exception("Error during query-execution:\n{$query->getContent()}.\n");
 				}
 			}
 

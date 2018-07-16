@@ -136,7 +136,10 @@ class Query
 
 			return 1 == $result[0]['already_exist'];
 		} catch (\Exception $exception) {
-			echo($exception);
+			if (false === strpos($exception, "'dbv.dbv_queries' doesn't exist")
+				&& false === strpos($exception, "'dbv.dbv_state' doesn't exist")) {
+				echo($exception);
+			}
 
 			return false;
 		}
@@ -147,19 +150,25 @@ class Query
 	 */
 	public function insert()
 	{
-		$this->getDatabase()->query(
-			'INSERT IGNORE INTO dbv_queries (version, name, datetime, hash, query) 
+		try {
+			$this->getDatabase()->query(
+				'INSERT IGNORE INTO dbv_queries (version, name, datetime, hash, query) 
 					VALUES(:version, :name, NOW(), :hash, :query)',
-			[
-				':version' => $this->getVersion(),
-				':name'    => $this->getName(),
-				':hash'    => md5($this->getContent()),
-				':query'   => gzcompress(
-					$this->getContent(),
-					self::COMPRESSION
-				),
-			]
-		);
+				[
+					':version' => $this->getVersion(),
+					':name'    => $this->getName(),
+					':hash'    => md5($this->getContent()),
+					':query'   => gzcompress(
+						$this->getContent(),
+						self::COMPRESSION
+					),
+				]
+			);
+		} catch (\Exception $exception) {
+			if (false === strpos($exception, "'dbv.dbv_queries' doesn't exist")) {
+				echo $exception;
+			}
+		}
 	}
 
 	/**
@@ -197,7 +206,7 @@ class Query
 			microtime(true) - $startTime
 		);
 
-		return $status == 'OK';
+		return $status != self::STATUS_FAILED;
 	}
 
 	/**
