@@ -136,8 +136,8 @@ class Query
 
 			return 1 == $result[0]['already_exist'];
 		} catch (\Exception $exception) {
-			if (false === strpos($exception, "'dbv.dbv_queries' doesn't exist")
-				&& false === strpos($exception, "'dbv.dbv_state' doesn't exist")) {
+			if (false === strpos($exception, "dbv_queries' doesn't exist")
+				&& false === strpos($exception, "dbv_state' doesn't exist")) {
 				echo($exception);
 			}
 
@@ -165,7 +165,7 @@ class Query
 				]
 			);
 		} catch (\Exception $exception) {
-			if (false === strpos($exception, "'dbv.dbv_queries' doesn't exist")) {
+			if (false === strpos($exception, "dbv_queries' doesn't exist")) {
 				echo $exception;
 			}
 		}

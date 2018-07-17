@@ -97,7 +97,7 @@ class Log
 				]
 			);
 		} catch (\Exception $exception) {
-			if (false === strpos($exception, "'dbv.dbv_log' doesn't exist")) {
+			if (false === strpos($exception, "dbv_log' doesn't exist")) {
 				echo($exception);
 			}
 		}
