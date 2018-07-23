@@ -8,6 +8,8 @@
 
 namespace dbv;
 
+require_once __DIR__ . '/SSH.php';
+
 /**
  * Class Database
  *
@@ -57,6 +59,7 @@ class Database
 	 * @param string $password
 	 * @param string $name
 	 * @param string $charset
+	 * @param SSH $ssh
 	 */
 	public function __construct(
 		string $type,
@@ -64,7 +67,8 @@ class Database
 		string $user,
 		string $password,
 		string $name,
-		string $charset
+		string $charset,
+		SSH $ssh
 	)
 	{
 		$connection = $type . ':';
