@@ -59,7 +59,6 @@ class Database
 	 * @param string $password
 	 * @param string $name
 	 * @param string $charset
-	 * @param SSH $ssh
 	 */
 	public function __construct(
 		string $type,
@@ -67,8 +66,7 @@ class Database
 		string $user,
 		string $password,
 		string $name,
-		string $charset,
-		SSH $ssh
+		string $charset
 	)
 	{
 		$connection = $type . ':';

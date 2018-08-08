@@ -187,7 +187,9 @@ class Deploy
 			Database::TYPE_MYSQL,
 			$config['database']['host'],
 			$config['database']['user'],
-			$config['database']['password'], $config['database']['database'], $config['database']['charset']
+			$config['database']['password'],
+			$config['database']['database'],
+			$config['database']['charset']
 		);
 		$this->setDatabase($database);
 
