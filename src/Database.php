@@ -88,6 +88,7 @@ class Database
 		$pdo->query('SET SESSION lock_wait_timeout = 31536000');
 		$pdo->query('SET SESSION interactive_timeout = 28800');
 		$pdo->query('SET SESSION wait_timeout = 28800');
+		$pdo->query('SET GLOBAL max_allowed_packet = 524288000');
 
 		$this->setPdo($pdo);
 		$this->setType($type);
@@ -302,7 +303,7 @@ class Database
 				$table['table_name'],
 				$tableWhitelist
 			)) {
-				echo('Table: "' . $table['table_name'] . '" skipped during backup, because no changes detected' . "\n");
+				//echo('Table: "' . $table['table_name'] . '" skipped during backup, because no changes detected' . "\n");
 				continue;
 			}
 
