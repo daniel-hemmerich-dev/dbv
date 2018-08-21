@@ -88,7 +88,6 @@ class Database
 		$pdo->query('SET SESSION lock_wait_timeout = 31536000');
 		$pdo->query('SET SESSION interactive_timeout = 28800');
 		$pdo->query('SET SESSION wait_timeout = 28800');
-		$pdo->query('SET GLOBAL max_allowed_packet = 8G');
 
 		$this->setPdo($pdo);
 		$this->setType($type);

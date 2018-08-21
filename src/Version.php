@@ -20,7 +20,6 @@ require_once __DIR__ . '/Log.php';
 class Version
 {
 	const PREFIX = 'v';
-	const BACKUP = 'backup.sql';
 
 	/**
 	 * @var string
@@ -59,7 +58,7 @@ class Version
 
 		$matches = [];
 		foreach (scandir($this->getFullpath()) as $queryFile) {
-			if ('.' == substr($queryFile, 0, 1) || is_dir($queryFile) || SELF::BACKUP == $queryFile) {
+			if ('.' == substr($queryFile, 0, 1) || is_dir($queryFile)) {
 				continue;
 			}
 			if (!preg_match(
@@ -176,21 +175,92 @@ class Version
 		}
 
 		echo("Creating Backup\n");
-		$backupFile = $this->getFullpath() . SELF::BACKUP;
-		$this->getDatabase()->dump(
-			$backupFile,
-			$backuplist
+		$this->dump($backuplist);
+	}
+
+	/**
+	 * @param array $tableWhitelist
+	 *
+	 * @throws \Exception
+	 */
+	protected function dump(array $tableWhitelist)
+	{
+		$tables = $this->getDatabase()->query(
+			'SELECT table_name FROM information_schema.tables where table_schema=:database',
+			['database' => $this->getDatabase()->getName()]
 		);
 
-		if (file_exists($backupFile)) {
+		foreach ($tables as $table) {
+			if (!in_array(
+				$table['table_name'],
+				$tableWhitelist
+			)) {
+				//echo('Table: "' . $table['table_name'] . '" skipped during backup, because no changes detected' . "\n");
+				continue;
+			}
+
+			echo('Backing-up table: ' . $table['table_name'] . "\n");
+
+			$createTable = $this->query(
+				'SHOW CREATE TABLE ' . $table['table_name'],
+				[]
+			);
+
+			$resultTable     = $this->query(
+				'SELECT * FROM ' . $table['table_name'],
+				[]
+			);
+			$dumpDropTable   =
+				"-- Dump of Table " . $table['table_name'] . "\nDROP TABLE IF EXISTS `" . $table['table_name'] . "`;\n";
+			$dumpCreateTable = $createTable[0]['Create Table'];
+
+			if (0 == count($resultTable)) {
+				continue;
+			}
+
+			$resultTableChunks = array_chunk(
+				$resultTable,
+				self::DUMP_SPLIT,
+				true
+			);
+			foreach ($resultTableChunks as $tableChunk) {
+				$insertTable = "INSERT INTO `"
+					. $table['table_name']
+					. "` ("
+					. implode(', ', array_keys($resultTable[0]))
+					. ") \nVALUES";
+				foreach ($tableChunk as $row) {
+					$insertTable .= "\n(";
+					foreach ($row as $value) {
+						$insertTable .= "'" . $value . "',";
+					}
+					$insertTable = substr(
+						$insertTable,
+						0,
+						-1
+					);
+					$insertTable .= "),";
+				}
+				$insertTable = substr_replace(
+					$insertTable,
+					';',
+					-1
+				);
+				$query       = new Query(
+					$this->getDatabase(), $this->getVersion(), 'backup_' . md5($insertTable), $insertTable
+				);
+				$query->insert();
+			}
+
 			$query = new Query(
-				$this->getDatabase(),
-				$this->getVersion(),
-				'backup_' . md5(implode('', $backuplist)),
-				file_get_contents($backupFile)
+				$this->getDatabase(), $this->getVersion(), 'backup_' . md5($dumpCreateTable), $dumpCreateTable
 			);
 			$query->insert();
-			unlink($backupFile);
+
+			$query = new Query(
+				$this->getDatabase(), $this->getVersion(), 'backup_' . md5($dumpDropTable), $dumpDropTable
+			);
+			$query->insert();
 		}
 	}
 
