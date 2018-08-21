@@ -198,7 +198,7 @@ class Database
 				$table['table_name'],
 				$tableWhitelist
 			)) {
-				echo('Table: "' . $table['table_name'] . '" skipped during synchronization' . "\n");
+				//echo('Table: "' . $table['table_name'] . '" skipped during synchronization' . "\n");
 				continue;
 			}
 
