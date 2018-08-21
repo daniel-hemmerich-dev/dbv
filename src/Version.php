@@ -201,12 +201,12 @@ class Version
 
 			echo('Backing-up table: ' . $table['table_name'] . "\n");
 
-			$createTable = $this->query(
+			$createTable = $this->getDatabase()->query(
 				'SHOW CREATE TABLE ' . $table['table_name'],
 				[]
 			);
 
-			$resultTable     = $this->query(
+			$resultTable     = $this->getDatabase()->query(
 				'SELECT * FROM ' . $table['table_name'],
 				[]
 			);
