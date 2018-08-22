@@ -319,7 +319,7 @@ class Version
 				$message   = '';
 				try {
 					$this->getDatabase()->query(
-						gzuncompress($backup['query']),
+						$backup['query'],
 						[]
 					);
 				} catch (\Exception $exception) {
