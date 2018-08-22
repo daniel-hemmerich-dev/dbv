@@ -211,8 +211,7 @@ class Version
 				'SELECT * FROM ' . $table['table_name'],
 				[]
 			);
-			$dumpDropTable   =
-				"-- Dump of Table " . $table['table_name'] . "\nDROP TABLE IF EXISTS `" . $table['table_name'] . "`;\n";
+			$dumpDropTable   = "DROP TABLE IF EXISTS `" . $table['table_name'] . "`";
 			$dumpCreateTable = $createTable[0]['Create Table'];
 
 			if (0 == count($resultTable)) {
@@ -244,22 +243,31 @@ class Version
 				}
 				$insertTable = substr_replace(
 					$insertTable,
-					';',
+					'',
 					-1
 				);
 				$query       = new Query(
-					$this->getDatabase(), $this->getVersion(), 'backup_' . ($chunkkey + 3) . '_' . $table['table_name'] . '_' . md5($insertTable), $insertTable
+					$this->getDatabase(),
+					$this->getVersion(),
+					'backup_' . ($chunkkey + 3) . '_' . $table['table_name'] . '_' . md5(time() . $insertTable),
+					$insertTable
 				);
 				$query->insert();
 			}
 
 			$query = new Query(
-				$this->getDatabase(), $this->getVersion(), 'backup_2_' . $table['table_name'] . '_' . md5($dumpCreateTable), $dumpCreateTable
+				$this->getDatabase(),
+				$this->getVersion(),
+				'backup_2_' . $table['table_name'] . '_' . md5(time() . $dumpCreateTable),
+				$dumpCreateTable
 			);
 			$query->insert();
 
 			$query = new Query(
-				$this->getDatabase(), $this->getVersion(), 'backup_1_' . $table['table_name'] . '_' . md5($dumpDropTable), $dumpDropTable
+				$this->getDatabase(),
+				$this->getVersion(),
+				'backup_1_' . $table['table_name'] . '_' . md5(time() . $dumpDropTable),
+				$dumpDropTable
 			);
 			$query->insert();
 		}
@@ -307,7 +315,7 @@ class Version
 			$backups = $this->getDatabase()->query(
 				'SELECT name, query, datetime FROM dbv_queries 
 						WHERE version=:version AND name LIKE :name 
-						ORDER BY datetime DESC',
+						ORDER BY datetime DESC, name ASC',
 				[
 					':version' => $this->getVersion(),
 					':name'    => 'backup_%',
