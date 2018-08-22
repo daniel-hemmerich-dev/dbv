@@ -162,6 +162,8 @@ class Deploy
 	 */
 	public function __construct(string $configPath)
 	{
+		echo "Initializing {$configPath}...\n";
+
 		if (!file_exists($configPath)) {
 			throw new \Exception('Config-File "' . $configPath . '" does not exit.');
 		}
