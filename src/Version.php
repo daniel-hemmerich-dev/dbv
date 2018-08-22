@@ -19,7 +19,8 @@ require_once __DIR__ . '/Log.php';
  */
 class Version
 {
-	const PREFIX = 'v';
+	const PREFIX     = 'v';
+	const DUMP_SPLIT = 1000;
 
 	/**
 	 * @var string
