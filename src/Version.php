@@ -81,7 +81,7 @@ class Version
 				);
 			}
 			$this->queries[$matches[1]] = new Query(
-				$database, $version, $matches[2], file_get_contents($this->getFullpath() . $queryFile)
+				$database, $version, $queryFile, file_get_contents($this->getFullpath() . $queryFile)
 			);
 		}
 	}
@@ -223,7 +223,7 @@ class Version
 				self::DUMP_SPLIT,
 				true
 			);
-			foreach ($resultTableChunks as $tableChunk) {
+			foreach ($resultTableChunks as $chunkkey => $tableChunk) {
 				$insertTable = "INSERT INTO `"
 					. $table['table_name']
 					. "` ("
@@ -247,18 +247,18 @@ class Version
 					-1
 				);
 				$query       = new Query(
-					$this->getDatabase(), $this->getVersion(), 'backup_' . md5($insertTable), $insertTable
+					$this->getDatabase(), $this->getVersion(), 'backup_' . ($chunkkey + 3) . '_' . $table['table_name'] . '_' . md5($insertTable), $insertTable
 				);
 				$query->insert();
 			}
 
 			$query = new Query(
-				$this->getDatabase(), $this->getVersion(), 'backup_' . md5($dumpCreateTable), $dumpCreateTable
+				$this->getDatabase(), $this->getVersion(), 'backup_2_' . $table['table_name'] . '_' . md5($dumpCreateTable), $dumpCreateTable
 			);
 			$query->insert();
 
 			$query = new Query(
-				$this->getDatabase(), $this->getVersion(), 'backup_' . md5($dumpDropTable), $dumpDropTable
+				$this->getDatabase(), $this->getVersion(), 'backup_1_' . $table['table_name'] . '_' . md5($dumpDropTable), $dumpDropTable
 			);
 			$query->insert();
 		}
