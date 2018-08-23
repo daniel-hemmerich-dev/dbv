@@ -78,10 +78,11 @@ class Database
 
 		$pdo = new \PDO(
 			$connection, $user, $password, [
-				\PDO::ATTR_ERRMODE          => \PDO::ERRMODE_EXCEPTION,
-				\PDO::ATTR_CASE             => \PDO::CASE_NATURAL,
-				\PDO::ATTR_ORACLE_NULLS     => \PDO::NULL_EMPTY_STRING,
-				\PDO::ATTR_EMULATE_PREPARES => true,
+				\PDO::ATTR_ERRMODE          		=> \PDO::ERRMODE_EXCEPTION,
+				\PDO::ATTR_CASE             		=> \PDO::CASE_NATURAL,
+				\PDO::ATTR_ORACLE_NULLS     		=> \PDO::NULL_EMPTY_STRING,
+				\PDO::ATTR_EMULATE_PREPARES 		=> true,
+				\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY	=> true
 			]
 		);
 
