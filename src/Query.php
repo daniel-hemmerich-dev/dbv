@@ -172,7 +172,7 @@ class Query
 	 */
 	public function execute(): bool
 	{
-		echo('Executing "' . $this->getName() . '"');
+		echo('Executing "' . $this->getName() . '"' . "\n");
 		$startTime = microtime(true);
 		$status    = self::STATUS_OK;
 		$message   = '';
