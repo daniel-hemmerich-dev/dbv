@@ -162,6 +162,7 @@ class Deploy
 	 */
 	public function __construct(string $configPath)
 	{
+		echo "------------------------------\n";
 		echo "Initializing {$configPath}...\n";
 
 		if (!file_exists($configPath)) {

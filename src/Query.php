@@ -178,18 +178,18 @@ class Query
 		$message   = '';
 		try {
 			if ($this->alreadyExecuted()) {
-				echo(' -> ' . self::STATUS_SKIPPED . "\n");
+				//echo(' -> ' . self::STATUS_SKIPPED . "\n");
 				$status = self::STATUS_SKIPPED;
 			} else {
 				$this->getDatabase()->query(
 					$this->getContent(),
 					[]
 				);
-				echo(' -> ' . self::STATUS_OK . "\n");
+				//echo(' -> ' . self::STATUS_OK . "\n");
 				$this->insert();
 			}
 		} catch (\Exception $exception) {
-			echo(' -> ' . self::STATUS_FAILED . "\n");
+			//echo(' -> ' . self::STATUS_FAILED . "\n");
 			echo($exception);
 			$status  = self::STATUS_FAILED;
 			$message = (string)$exception;
