@@ -396,6 +396,8 @@ class Deploy
 		string $mode
 	): bool
 	{
+		$startTime = microtime(true);
+
 		if ($deployVersion < 0) {
 			throw new \Exception('Version can not be negative, but the value is "' . $deployVersion . '".');
 		}
@@ -461,6 +463,14 @@ class Deploy
 				max($deployVersion, $this->getHighestVersion())
 			);
 		}
+
+		Log::instance($this->getDatabase())->insert(
+			$deployVersion,
+			'DEPLOYMENT FINISHED',
+			Query::STATUS_OK,
+			'',
+			microtime(true) - $startTime
+		);
 
 		return $deployed;
 	}
