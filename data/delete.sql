@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS dbv_log;
+DROP TABLE IF EXISTS dbv_queries;
+DROP TABLE IF EXISTS dbv_state;

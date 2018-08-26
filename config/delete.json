@@ -1,0 +1,17 @@
+{
+	"changes": {
+		"src": "../data/database/"
+	},
+	"backups": {
+		"chunksize": "1000"
+	},
+	"database": {
+		"type": "mysql",
+		"host": "127.0.0.1",
+		"database": "",
+		"user": "root",
+		"password": "root",
+		"charset": "UTF8"
+	},
+	"postscript": "../data/delete.sql"
+}
