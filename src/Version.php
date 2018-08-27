@@ -191,7 +191,7 @@ class Version
 
 		foreach ($tables as $table) {
 			if (!in_array(
-				$table['table_name'],
+				$table['Name'],
 				$tableWhitelist
 			)) {
 				//echo('Table: "' . $table['table_name'] . '" skipped during backup, because no changes detected' . "\n");
