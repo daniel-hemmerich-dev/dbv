@@ -90,10 +90,10 @@ class Database
 			]
 		);
 
-		$this->query('SET SESSION lock_wait_timeout = 31536000');
-		$this->query('SET SESSION interactive_timeout = 28800');
-		$this->query('SET SESSION wait_timeout = 28800');
-		$result = $this->query('SHOW VARIABLES LIKE "max_allowed_packet"');
+		$this->query('SET SESSION lock_wait_timeout = 31536000', []);
+		$this->query('SET SESSION interactive_timeout = 28800', []);
+		$this->query('SET SESSION wait_timeout = 28800', []);
+		$result = $this->query('SHOW VARIABLES LIKE "max_allowed_packet"', []);
 
 		$this->setPdo($pdo);
 		$this->setType($type);
