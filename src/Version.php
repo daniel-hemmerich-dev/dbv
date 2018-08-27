@@ -20,6 +20,7 @@ require_once __DIR__ . '/Log.php';
 class Version
 {
 	const PREFIX     = 'v';
+	const CHUNK_SIZE = 1000;
 
 	/**
 	 * @var string
@@ -224,7 +225,7 @@ class Version
 				(int)(($this->getDatabase()->getMaxAllowedPacked() - 4096) / ($table['Avg_row_length'] + 1));
 			$resultTableChunks = array_chunk(
 				$resultTable,
-				max($splitCount - 1, 1),
+				max(max($splitCount, self::CHUNK_SIZE) - 1, 1),
 				true
 			);
 			foreach ($resultTableChunks as $chunkkey => $tableChunk) {
