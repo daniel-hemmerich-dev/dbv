@@ -108,7 +108,7 @@ class Database
 		$this->query('SET SESSION wait_timeout = 28800', []);
 
 		$result = $this->query('SHOW VARIABLES LIKE "max_allowed_packet"', []);
-		$this->setMaxAllowedPacked($result['Value']);
+		$this->setMaxAllowedPacked($result[0]['Value']);
 	}
 
 	/**
