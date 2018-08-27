@@ -220,7 +220,8 @@ class Version
 				continue;
 			}
 
-			$splitCount        = (int)(($this->getDatabase()->getMaxAllowedPacked() - 4096) / $table['Avg_row_length']);
+			$splitCount        =
+				(int)(($this->getDatabase()->getMaxAllowedPacked() - 4096) / ($table['Avg_row_length'] + 1));
 			$resultTableChunks = array_chunk(
 				$resultTable,
 				max($splitCount - 1, 1),
