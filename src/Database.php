@@ -50,6 +50,11 @@ class Database
 	protected $name = '';
 
 	/**
+	 * @var string
+	 */
+	protected $charset = '';
+
+	/**
 	 * @var int
 	 */
 	protected $maxAllowedPacked = 0;
@@ -73,15 +78,22 @@ class Database
 		string $charset
 	)
 	{
-		$connection = $type . ':';
-		$connection .= 'host=' . $host . ';';
-		$connection .= 'charset=' . $charset . ';';
-		if ('' != $name) {
-			$connection .= 'dbname=' . $name . ';';
+		$this->setType($type);
+		$this->setHost($host);
+		$this->setUser($user);
+		$this->setPassword($password);
+		$this->setName($name);
+		$this->setCharset($charset);
+
+		$connection = $this->getType() . ':';
+		$connection .= 'host=' . $this->getHost() . ';';
+		$connection .= 'charset=' . $this->getCharset() . ';';
+		if ('' != $this->getName()) {
+			$connection .= 'dbname=' . $this->getName() . ';';
 		}
 
 		$pdo = new \PDO(
-			$connection, $user, $password, [
+			$connection, $this->getUser(), $this->getPassword(), [
 				\PDO::ATTR_ERRMODE          		=> \PDO::ERRMODE_EXCEPTION,
 				\PDO::ATTR_CASE             		=> \PDO::CASE_NATURAL,
 				\PDO::ATTR_ORACLE_NULLS     		=> \PDO::NULL_EMPTY_STRING,
@@ -89,18 +101,13 @@ class Database
 				\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY	=> true
 			]
 		);
+		$this->setPdo($pdo);
 
 		$this->query('SET SESSION lock_wait_timeout = 31536000', []);
 		$this->query('SET SESSION interactive_timeout = 28800', []);
 		$this->query('SET SESSION wait_timeout = 28800', []);
-		$result = $this->query('SHOW VARIABLES LIKE "max_allowed_packet"', []);
 
-		$this->setPdo($pdo);
-		$this->setType($type);
-		$this->setHost($host);
-		$this->setUser($user);
-		$this->setPassword($password);
-		$this->setName($name);
+		$result = $this->query('SHOW VARIABLES LIKE "max_allowed_packet"', []);
 		$this->setMaxAllowedPacked($result['Value']);
 	}
 
@@ -452,5 +459,21 @@ class Database
 	public function setMaxAllowedPacked(int $maxAllowedPacked): void
 	{
 		$this->maxAllowedPacked = $maxAllowedPacked;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getCharset(): string
+	{
+		return $this->charset;
+	}
+
+	/**
+	 * @param string $charset
+	 */
+	public function setCharset(string $charset): void
+	{
+		$this->charset = $charset;
 	}
 }
