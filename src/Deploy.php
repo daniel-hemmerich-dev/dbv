@@ -425,7 +425,7 @@ class Deploy
 			);
 		}
 
-		echo('Deploying version: "' . $deployVersion . '"' . "\n");
+		echo('Deploying version: ' . $deployVersion . "\n");
 		$deployed = false;
 		if ($deployVersion == $this->getCurrentVersion()) {
 			$deployed = $this->deploySameVersion($deployVersion);

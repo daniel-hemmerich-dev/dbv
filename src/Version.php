@@ -175,7 +175,6 @@ class Version
 			}
 		}
 
-		echo("Creating Backup\n");
 		$this->dump($backuplist);
 	}
 
