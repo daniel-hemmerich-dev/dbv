@@ -103,6 +103,8 @@ try {
 		throw new Exception('Deployment failed!');
 	}
 } catch (Exception $exception) {
-	exit($exception);
+	echo($exception . "\n");
+	echo "------------------------------\n";
+	exit(42);
 }
 exit(0);
