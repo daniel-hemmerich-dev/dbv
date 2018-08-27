@@ -225,7 +225,7 @@ class Version
 				(int)(($this->getDatabase()->getMaxAllowedPacked() - 4096) / ($table['Avg_row_length'] + 1));
 			$resultTableChunks = array_chunk(
 				$resultTable,
-				max(max($splitCount, self::CHUNK_SIZE) - 1, 1),
+				max(min($splitCount, self::CHUNK_SIZE) - 1, 1),
 				true
 			);
 			foreach ($resultTableChunks as $chunkkey => $tableChunk) {
