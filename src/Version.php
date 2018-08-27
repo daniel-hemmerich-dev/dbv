@@ -20,7 +20,6 @@ require_once __DIR__ . '/Log.php';
 class Version
 {
 	const PREFIX     = 'v';
-	const DUMP_SPLIT = 1000;
 
 	/**
 	 * @var string
@@ -186,8 +185,8 @@ class Version
 	protected function dump(array $tableWhitelist)
 	{
 		$tables = $this->getDatabase()->query(
-			'SELECT table_name FROM information_schema.tables where table_schema=:database',
-			['database' => $this->getDatabase()->getName()]
+			'SHOW TABLE STATUS',
+			[]
 		);
 
 		foreach ($tables as $table) {
@@ -196,6 +195,10 @@ class Version
 				$tableWhitelist
 			)) {
 				//echo('Table: "' . $table['table_name'] . '" skipped during backup, because no changes detected' . "\n");
+				continue;
+			}
+
+			if (!$table['Engine']) {
 				continue;
 			}
 
@@ -217,9 +220,10 @@ class Version
 				continue;
 			}
 
+			$splitCount        = (int)(($this->getDatabase()->getMaxAllowedPacked() - 4096) / $table['Avg_row_length']);
 			$resultTableChunks = array_chunk(
 				$resultTable,
-				self::DUMP_SPLIT,
+				max($splitCount - 1, 1),
 				true
 			);
 			foreach ($resultTableChunks as $chunkkey => $tableChunk) {
