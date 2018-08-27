@@ -15,7 +15,7 @@
  * it first makes the changes on all copies and if no errors rename them at the end and delete the originals
  * in case of error delete the copies and keep the originals
  */
-
+$result = 0;
 try {
 	// setup
 	error_reporting(E_ALL);
@@ -104,7 +104,7 @@ try {
 	}
 } catch (Exception $exception) {
 	echo($exception . "\n");
-	echo "------------------------------\n";
-	exit(42);
+	$result = 42;
 }
-exit(0);
+echo "------------------------------\n";
+exit($result);
