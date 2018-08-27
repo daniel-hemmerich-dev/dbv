@@ -356,10 +356,10 @@ class Database
 				FILE_APPEND
 			);
 
-			$splitCount        = (int)($table['Avg_row_length'] / $this->getMaxAllowedPacked());
+			$splitCount        = (int)(($this->getMaxAllowedPacked() + 4096) / $table['Avg_row_length']);
 			$resultTableChunks = array_chunk(
 				$resultTable,
-				$splitCount,
+				max($splitCount - 1, 1),
 				true
 			);
 			foreach ($resultTableChunks as $tableChunk) {
