@@ -202,18 +202,18 @@ class Version
 				continue;
 			}
 
-			echo('Backing-up table: ' . $table['table_name'] . "\n");
+			echo('Backing-up table: ' . $table['Name'] . "\n");
 
 			$createTable = $this->getDatabase()->query(
-				'SHOW CREATE TABLE ' . $table['table_name'],
+				'SHOW CREATE TABLE ' . $table['Name'],
 				[]
 			);
 
 			$resultTable     = $this->getDatabase()->query(
-				'SELECT * FROM ' . $table['table_name'],
+				'SELECT * FROM ' . $table['Name'],
 				[]
 			);
-			$dumpDropTable   = "DROP TABLE IF EXISTS `" . $table['table_name'] . "`";
+			$dumpDropTable   = "DROP TABLE IF EXISTS `" . $table['Name'] . "`";
 			$dumpCreateTable = $createTable[0]['Create Table'];
 
 			if (0 == count($resultTable)) {
@@ -227,8 +227,7 @@ class Version
 				true
 			);
 			foreach ($resultTableChunks as $chunkkey => $tableChunk) {
-				$insertTable = "INSERT INTO `"
-					. $table['table_name']
+				$insertTable = "INSERT INTO `" . $table['Name']
 					. "` ("
 					. implode(', ', array_keys($resultTable[0]))
 					. ") \nVALUES";
@@ -252,7 +251,7 @@ class Version
 				$query       = new Query(
 					$this->getDatabase(),
 					$this->getVersion(),
-					'backup_' . ($chunkkey + 3) . '_' . $table['table_name'] . '_' . md5(time() . $insertTable),
+					'backup_' . ($chunkkey + 3) . '_' . $table['Name'] . '_' . md5(time() . $insertTable),
 					$insertTable
 				);
 				$query->insert();
@@ -260,16 +259,14 @@ class Version
 
 			$query = new Query(
 				$this->getDatabase(),
-				$this->getVersion(),
-				'backup_2_' . $table['table_name'] . '_' . md5(time() . $dumpCreateTable),
+				$this->getVersion(), 'backup_2_' . $table['Name'] . '_' . md5(time() . $dumpCreateTable),
 				$dumpCreateTable
 			);
 			$query->insert();
 
 			$query = new Query(
 				$this->getDatabase(),
-				$this->getVersion(),
-				'backup_1_' . $table['table_name'] . '_' . md5(time() . $dumpDropTable),
+				$this->getVersion(), 'backup_1_' . $table['Name'] . '_' . md5(time() . $dumpDropTable),
 				$dumpDropTable
 			);
 			$query->insert();
