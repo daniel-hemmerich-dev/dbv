@@ -18,7 +18,7 @@ require_once __DIR__ . '/SSH.php';
 class Database
 {
 	const TYPE_MYSQL = 'mysql';
-	const DUMP_SPLIT = 1000;
+	const DUMP_SPLIT = 250;
 
 	/**
 	 * @var null
