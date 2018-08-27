@@ -18,7 +18,6 @@ require_once __DIR__ . '/SSH.php';
 class Database
 {
 	const TYPE_MYSQL = 'mysql';
-	const DUMP_SPLIT = 250;
 
 	/**
 	 * @var null
@@ -49,6 +48,11 @@ class Database
 	 * @var string
 	 */
 	protected $name = '';
+
+	/**
+	 * @var int
+	 */
+	protected $maxAllowedPacked = 0;
 
 	/**
 	 * Database constructor.
@@ -89,6 +93,7 @@ class Database
 		$pdo->query('SET SESSION lock_wait_timeout = 31536000');
 		$pdo->query('SET SESSION interactive_timeout = 28800');
 		$pdo->query('SET SESSION wait_timeout = 28800');
+		$result = $pdo->query('SHOW VARIABLES LIKE "max_allowed_packet"');
 
 		$this->setPdo($pdo);
 		$this->setType($type);
@@ -96,6 +101,7 @@ class Database
 		$this->setUser($user);
 		$this->setPassword($password);
 		$this->setName($name);
+		$this->setMaxAllowedPacked($result['Value']);
 	}
 
 	/**
@@ -294,8 +300,8 @@ class Database
 	)
 	{
 		$tables = $this->query(
-			'SELECT table_name FROM information_schema.tables where table_schema=:database',
-			['database' => $this->getName()]
+			'SHOW TABLE STATUS',
+			[]
 		);
 
 		foreach ($tables as $table) {
@@ -304,6 +310,10 @@ class Database
 				$tableWhitelist
 			)) {
 				//echo('Table: "' . $table['table_name'] . '" skipped during backup, because no changes detected' . "\n");
+				continue;
+			}
+
+			if (!$table['Engine']) {
 				continue;
 			}
 
@@ -339,9 +349,10 @@ class Database
 				FILE_APPEND
 			);
 
+			$splitCount        = (int)($table['Avg_row_length'] / $this->getMaxAllowedPacked());
 			$resultTableChunks = array_chunk(
 				$resultTable,
-				self::DUMP_SPLIT,
+				$splitCount,
 				true
 			);
 			foreach ($resultTableChunks as $tableChunk) {
@@ -425,5 +436,21 @@ class Database
 	public function setName(string $name)//: void
 	{
 		$this->name = $name;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getMaxAllowedPacked(): int
+	{
+		return $this->maxAllowedPacked;
+	}
+
+	/**
+	 * @param int $maxAllowedPacked
+	 */
+	public function setMaxAllowedPacked(int $maxAllowedPacked): void
+	{
+		$this->maxAllowedPacked = $maxAllowedPacked;
 	}
 }
