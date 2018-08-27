@@ -353,7 +353,7 @@ class Database
 	/**
 	 * @param int $maxAllowedPacked
 	 */
-	public function setMaxAllowedPacked(int $maxAllowedPacked): void
+	public function setMaxAllowedPacked(int $maxAllowedPacked)//: void
 	{
 		$this->maxAllowedPacked = $maxAllowedPacked;
 	}
@@ -369,7 +369,7 @@ class Database
 	/**
 	 * @param string $charset
 	 */
-	public function setCharset(string $charset): void
+	public function setCharset(string $charset)//: void
 	{
 		$this->charset = $charset;
 	}
