@@ -19,7 +19,8 @@ require_once __DIR__ . '/Log.php';
  */
 class Version
 {
-	const PREFIX     = 'v';
+	const PREFIX = 'v';
+	const OFFSET = 64;
 
 	/**
 	 * @var string
@@ -221,6 +222,7 @@ class Version
 			}
 
 			$insertTable = '';
+			$offset      = self::OFFSET;
 			foreach ($resultTable as $rowId => $row) {
 				if ('' == $insertTable) {
 					$insertTable = "INSERT INTO `"
@@ -239,7 +241,8 @@ class Version
 					-1
 				);
 				$insertTable .= "),";
-				if ((strlen($insertTable) + 4096 + ($table['Avg_row_length'] * 2)) >= $this->getDatabase()
+				$offset      += self::OFFSET;
+				if ((strlen($insertTable) + $offset + ($table['Avg_row_length'] * 2)) >= $this->getDatabase()
 						->getMaxAllowedPacked()) {
 					$insertTable = substr_replace(
 						$insertTable,
@@ -254,6 +257,7 @@ class Version
 					);
 					$query->insert();
 					$insertTable = '';
+					$offset      = self::OFFSET;
 				}
 			}
 
