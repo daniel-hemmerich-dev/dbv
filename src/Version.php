@@ -20,7 +20,6 @@ require_once __DIR__ . '/Log.php';
 class Version
 {
 	const PREFIX     = 'v';
-	const CHUNK_SIZE = 1000;
 
 	/**
 	 * @var string
@@ -221,42 +220,41 @@ class Version
 				continue;
 			}
 
-			$splitCount        =
-				(int)(($this->getDatabase()->getMaxAllowedPacked() - 4096) / ($table['Avg_row_length'] + 1));
-			$resultTableChunks = array_chunk(
-				$resultTable,
-				max(min($splitCount, self::CHUNK_SIZE) - 1, 1),
-				true
-			);
-			foreach ($resultTableChunks as $chunkkey => $tableChunk) {
-				$insertTable = "INSERT INTO `" . $table['Name']
-					. "` ("
-					. implode(', ', array_keys($resultTable[0]))
-					. ") \nVALUES";
-				foreach ($tableChunk as $row) {
-					$insertTable .= "\n(";
-					foreach ($row as $value) {
-						$insertTable .= "'" . $value . "',";
-					}
-					$insertTable = substr(
-						$insertTable,
-						0,
-						-1
-					);
-					$insertTable .= "),";
+			$insertTable = '';
+			foreach ($resultTable as $rowId => $row) {
+				if ('' == $insertTable) {
+					$insertTable = "INSERT INTO `"
+						. $table['Name']
+						. "` ("
+						. implode(', ', array_keys($resultTable[0]))
+						. ") \nVALUES";
 				}
-				$insertTable = substr_replace(
+				$insertTable .= "\n(";
+				foreach ($row as $value) {
+					$insertTable .= "'" . $value . "',";
+				}
+				$insertTable = substr(
 					$insertTable,
-					'',
+					0,
 					-1
 				);
-				$query       = new Query(
-					$this->getDatabase(),
-					$this->getVersion(),
-					'backup_' . ($chunkkey + 3) . '_' . $table['Name'] . '_' . md5(time() . $insertTable),
-					$insertTable
-				);
-				$query->insert();
+				$insertTable .= "),";
+				if ((strlen($insertTable) + ($table['Avg_row_length'] * 2)) >= $this->getDatabase()
+						->getMaxAllowedPacked()) {
+					$insertTable = substr_replace(
+						$insertTable,
+						'',
+						-1
+					);
+					$query       = new Query(
+						$this->getDatabase(),
+						$this->getVersion(),
+						'backup_' . ($rowId + 3) . '_' . $table['Name'] . '_' . md5(time() . $insertTable),
+						$insertTable
+					);
+					$query->insert();
+					$insertTable = '';
+				}
 			}
 
 			$query = new Query(
