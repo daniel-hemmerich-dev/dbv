@@ -239,7 +239,7 @@ class Version
 					-1
 				);
 				$insertTable .= "),";
-				if ((strlen($insertTable) + ($table['Avg_row_length'] * 2)) >= $this->getDatabase()
+				if ((strlen($insertTable) + 4096 + ($table['Avg_row_length'] * 2)) >= $this->getDatabase()
 						->getMaxAllowedPacked()) {
 					$insertTable = substr_replace(
 						$insertTable,
