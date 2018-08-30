@@ -218,7 +218,8 @@ class Version
 			$dumpDropTable   = "DROP TABLE IF EXISTS `" . $table['Name'] . "`";
 			$dumpCreateTable = $createTable[0]['Create Table'];
 
-			if (0 == count($resultTable)) {
+			$resultCount = count($resultTable);
+			if (0 == $resultCount) {
 				continue;
 			}
 
@@ -244,7 +245,7 @@ class Version
 				$insertTable  .= "),";
 				$offset       += self::OFFSET;
 				$insertLength = strlen($insertTable);
-				if (($insertLength >= self::SPLITSIZE)
+				if (($resultCount == ($rowId - 1)) || ($insertLength >= self::SPLITSIZE)
 					|| (($insertLength + $offset + ($table['Avg_row_length'] * 2)) >= $this->getDatabase()
 							->getMaxAllowedPacked())) {
 					$insertTable = substr_replace(
