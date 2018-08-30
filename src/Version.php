@@ -19,8 +19,9 @@ require_once __DIR__ . '/Log.php';
  */
 class Version
 {
-	const PREFIX = 'v';
-	const OFFSET = 64;
+	const PREFIX    = 'v';
+	const OFFSET    = 64;
+	const SPLITSIZE = 250000;
 
 	/**
 	 * @var string
@@ -235,15 +236,17 @@ class Version
 				foreach ($row as $value) {
 					$insertTable .= "'" . $value . "',";
 				}
-				$insertTable = substr(
+				$insertTable  = substr(
 					$insertTable,
 					0,
 					-1
 				);
-				$insertTable .= "),";
-				$offset      += self::OFFSET;
-				if ((strlen($insertTable) + $offset + ($table['Avg_row_length'] * 2)) >= $this->getDatabase()
-						->getMaxAllowedPacked()) {
+				$insertTable  .= "),";
+				$offset       += self::OFFSET;
+				$insertLength = strlen($insertTable);
+				if (($insertLength >= self::SPLITSIZE)
+					|| (($insertLength + $offset + ($table['Avg_row_length'] * 2)) >= $this->getDatabase()
+							->getMaxAllowedPacked())) {
 					$insertTable = substr_replace(
 						$insertTable,
 						'',
