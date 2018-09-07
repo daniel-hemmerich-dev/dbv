@@ -208,7 +208,7 @@ class Deploy
 				continue;
 			}
 			if (!preg_match(
-				'/^' . Version::PREFIX . '\d+$/',
+				'/^' . Version::PREFIX . '\d+$/i',
 				$dir
 			)) {
 				throw new \Exception(
