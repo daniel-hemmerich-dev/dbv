@@ -410,6 +410,7 @@ class Deploy
 		}
 
 		if (self::MODE_VALIDATE == $mode) {
+			echo('Validating version: ' . $deployVersion . "\n");
 			new Version(
 				$this->getPath(), $deployVersion, $this->getDatabase()
 			);
