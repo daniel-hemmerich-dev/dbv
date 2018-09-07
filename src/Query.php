@@ -172,7 +172,6 @@ class Query
 	 */
 	public function execute(): bool
 	{
-		echo('Executing "' . $this->getName() . '"' . "\n");
 		$startTime = microtime(true);
 		$status    = self::STATUS_OK;
 		$message   = '';
@@ -180,7 +179,9 @@ class Query
 			if ($this->alreadyExecuted()) {
 				//echo(' -> ' . self::STATUS_SKIPPED . "\n");
 				$status = self::STATUS_SKIPPED;
+				echo('Skipped "' . $this->getName() . '"' . "\n");
 			} else {
+				echo('Executing "' . $this->getName() . '"' . "\n");
 				$this->getDatabase()->query(
 					$this->getContent(),
 					[]
