@@ -58,6 +58,10 @@ class Version
 		$this->setVersion($version);
 		$this->setDatabase($database);
 
+		if (!is_dir($this->getFullpath())) {
+			return;
+		}
+
 		$matches = [];
 		foreach (scandir($this->getFullpath()) as $queryFile) {
 			if ('.' == substr($queryFile, 0, 1) || is_dir($queryFile)) {
