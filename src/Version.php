@@ -85,11 +85,8 @@ class Version
 				throw new \Exception(
 					'A query with the same id "'
 					. $matches[1]
-					. '"from file "'
-					. $queryFile
-					. '" already exist in "'
-					. $this->queries[$matches[1]]->getName()
-					. '"".'
+					. '"from file "' . $this->getFullpath() . $queryFile
+					. '" already exist in "' . $this->getFullpath() . $this->queries[$matches[1]]->getName() . '".'
 				);
 			}
 			$this->queries[$matches[1]] = new Query(
