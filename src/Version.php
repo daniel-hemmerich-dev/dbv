@@ -83,7 +83,13 @@ class Version
 			}
 			if (isset($this->queries[$matches[1]])) {
 				throw new \Exception(
-					'A query with the same id "' . $matches[1] . '"from file "' . $queryFile . '" already exist.'
+					'A query with the same id "'
+					. $matches[1]
+					. '"from file "'
+					. $queryFile
+					. '" already exist in "'
+					. $this->queries[$matches[1]]->getName()
+					. '"".'
 				);
 			}
 			$this->queries[$matches[1]] = new Query(
