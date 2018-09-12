@@ -1,4 +1,5 @@
-CREATE TABLE `dbv_log` (
+DROP TABLE `dbv_log`;
+CREATE TABLE IF NOT EXISTS `dbv_log` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `datetime` datetime NOT NULL,
   `version` bigint(10) unsigned NOT NULL,

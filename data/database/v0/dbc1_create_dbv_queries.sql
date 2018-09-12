@@ -1,3 +1,4 @@
+DROP TABLE `dbv_queries`;
 CREATE TABLE IF NOT EXISTS `dbv_queries` (
   `version` bigint(20) unsigned NOT NULL,
   `name` varchar(128) NOT NULL DEFAULT '',
