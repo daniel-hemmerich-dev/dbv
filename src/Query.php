@@ -109,11 +109,23 @@ class Query
 	public function setTables(array $tables)//: void
 	{
 		foreach ($tables as $table) {
-			$this->tables[] = str_replace(
+			$tmp_table = str_replace(
 				'`',
 				'',
 				$table
 			);
+			$matches   = [];
+			preg_match(
+				'/\b([a-zA-Z0-9_]+)[.]([a-zA-Z0-9_]+)/im',
+				$tmp_table,
+				$matches
+			);
+			if (strcmp(
+				$matches[1],
+				$this->getDatabase()->getName()
+			)) {
+				$this->tables[] = $matches[2];
+			}
 		}
 	}
 
