@@ -327,6 +327,16 @@ class Database
 	}
 
 	/**
+	 * @param string $value
+	 *
+	 * @return mixed
+	 */
+	public function quote(string $value)
+	{
+		return $this->pdo->quote($value);
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getName(): string
