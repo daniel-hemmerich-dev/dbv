@@ -114,17 +114,14 @@ class Query
 				'',
 				$table
 			);
-			$matches   = [];
-			preg_match(
-				'/\b([a-zA-Z0-9_]+)[.]([a-zA-Z0-9_]+)/im',
-				$tmp_table,
-				$matches
-			);
-			if (strcmp(
-				$matches[1],
-				$this->getDatabase()->getName()
-			)) {
-				$this->tables[] = $matches[2];
+			$matches   = explode('.', $tmp_table);
+
+			if (2 == count($matches)) {
+				if ($matches[0] == $this->getDatabase()->getName()) {
+					$this->tables[] = $matches[1];
+				}
+			} else {
+				$this->tables[] = $matches[0];
 			}
 		}
 	}
