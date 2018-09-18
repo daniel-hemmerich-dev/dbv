@@ -245,7 +245,11 @@ class Version
 				}
 				$insertTable .= "\n(";
 				foreach ($row as $value) {
-					$insertTable .= $this->getDatabase()->quote($value) . ',';
+					if (is_null($value)) {
+						$insertTable .= "'" . $value . "',";
+					} else {
+						$insertTable .= $this->getDatabase()->quote($value) . ',';
+					}
 				}
 				$insertTable  = substr(
 					$insertTable,
