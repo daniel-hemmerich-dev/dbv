@@ -337,7 +337,7 @@ class Version
 			$backups = $this->getDatabase()->query(
 				'SELECT name, query, datetime FROM dbv_queries 
 						WHERE version=:version AND name LIKE :name 
-						ORDER BY datetime DESC, name ASC',
+						ORDER BY id DESC',
 				[
 					':version' => $this->getVersion(),
 					':name'    => 'backup_%',

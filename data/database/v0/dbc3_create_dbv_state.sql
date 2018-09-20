@@ -1,4 +1,4 @@
-DROP TABLE `dbv_state`;
+DROP TABLE IF EXISTS `dbv_state`;
 CREATE TABLE IF NOT EXISTS `dbv_state` (
   `name` varchar(128) NOT NULL DEFAULT '',
   `value` varchar(128) NOT NULL DEFAULT '',
