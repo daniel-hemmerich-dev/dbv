@@ -269,8 +269,7 @@ class Version
 					);
 					$query       = new Query(
 						$this->getDatabase(),
-						$this->getVersion(),
-						'backup_' . ($rowId + 3) . '_' . $table['Name'] . '_' . md5(time() . $insertTable),
+						$this->getVersion(), 'backup_' . $table['Name'] . '_' . md5(time() . $insertTable),
 						$insertTable
 					);
 					$query->insert();
@@ -281,14 +280,16 @@ class Version
 
 			$query = new Query(
 				$this->getDatabase(),
-				$this->getVersion(), 'backup_2_' . $table['Name'] . '_' . md5(time() . $dumpCreateTable),
+				$this->getVersion(),
+				'backup_' . $table['Name'] . '_' . md5(time() . $dumpCreateTable),
 				$dumpCreateTable
 			);
 			$query->insert();
 
 			$query = new Query(
 				$this->getDatabase(),
-				$this->getVersion(), 'backup_1_' . $table['Name'] . '_' . md5(time() . $dumpDropTable),
+				$this->getVersion(),
+				'backup_' . $table['Name'] . '_' . md5(time() . $dumpDropTable),
 				$dumpDropTable
 			);
 			$query->insert();
