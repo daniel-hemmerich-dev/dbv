@@ -335,7 +335,7 @@ class Version
 		try {
 			echo("Performing a Rollback\n");
 			$backups = $this->getDatabase()->query(
-				'SELECT name, query, datetime FROM dbv_queries 
+				'SELECT id, name, query, datetime FROM dbv_queries 
 						WHERE version=:version AND name LIKE :name 
 						ORDER BY id DESC',
 				[
