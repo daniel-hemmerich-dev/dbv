@@ -185,7 +185,7 @@ class Query
 		$status    = self::STATUS_OK;
 		$message   = '';
 		try {
-			if ($this->alreadyExecuted()) {
+			if ($this->alreadyExecuted() || (0 == count($this->getTables()))) {
 				//echo(' -> ' . self::STATUS_SKIPPED . "\n");
 				$status = self::STATUS_SKIPPED;
 				echo('Skipped "' . $this->getName() . '"' . "\n");
