@@ -96,6 +96,8 @@ class Version
 				$database, $version, $queryFile, file_get_contents($this->getFullpath() . $queryFile)
 			);
 		}
+
+		ksort($this->queries);
 	}
 
 	/**
