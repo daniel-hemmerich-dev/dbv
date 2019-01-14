@@ -25,6 +25,11 @@ class Database
 	protected $pdo = null;
 
 	/**
+	 * @var null
+	 */
+	protected $pdo_buffered = null;
+
+	/**
 	 * @var string
 	 */
 	protected $type = self::TYPE_MYSQL;
@@ -107,6 +112,21 @@ class Database
 		$this->query('SET SESSION interactive_timeout = 28800', []);
 		$this->query('SET SESSION wait_timeout = 28800', []);
 
+		$pdo = new \PDO(
+			$connection, $this->getUser(), $this->getPassword(), [
+				\PDO::ATTR_ERRMODE          		=> \PDO::ERRMODE_EXCEPTION,
+				\PDO::ATTR_CASE             		=> \PDO::CASE_NATURAL,
+				\PDO::ATTR_ORACLE_NULLS     		=> \PDO::NULL_EMPTY_STRING,
+				\PDO::ATTR_EMULATE_PREPARES 		=> true,
+				\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY	=> false
+			]
+		);
+		$this->setPdoBuffered($pdo);
+
+		$this->query('SET SESSION lock_wait_timeout = 31536000', [], false);
+		$this->query('SET SESSION interactive_timeout = 28800', [], false);
+		$this->query('SET SESSION wait_timeout = 28800', [], false);
+
 		$result = $this->query('SHOW VARIABLES LIKE "max_allowed_packet"', []);
 		$this->setMaxAllowedPacked($result[0]['Value']);
 	}
@@ -125,6 +145,22 @@ class Database
 	public function setPdo(\PDO $pdo)//: void
 	{
 		$this->pdo = $pdo;
+	}
+
+	/**
+	 * @return null
+	 */
+	public function getPdoBuffered()
+	{
+		return $this->pdo_buffered;
+	}
+
+	/**
+	 * @param null $pdo_buffered
+	 */
+	public function setPdoBuffered($pdo_buffered)
+	{
+		$this->pdo_buffered = $pdo_buffered;
 	}
 
 	/**
@@ -308,22 +344,43 @@ class Database
 	/**
 	 * @param string $query
 	 * @param array $parameter
+	 * @param bool $fetch
 	 *
 	 * @return null
 	 */
 	public function query(
 		string $query,
-		array $parameter
+		array $parameter,
+		bool $fetch = true
 	)
 	{
-		$statement = $this->pdo->prepare($query);
-		$statement->execute($parameter);
-		try {
-			return $statement->fetchAll(\PDO::FETCH_ASSOC);
-		} catch (\Exception $exception) {
-			// non fetchable-statements
-			return null;
+		if($fetch) {
+			$statement = $this->getPdo()->prepare($query);
+			$statement->execute($parameter);
+			try {
+				return $statement->fetchAll(\PDO::FETCH_ASSOC);
+			} catch (\Exception $exception) {
+				// non fetchable-statements
+				return null;
+			}
+		} else {
+			$statement = $this->getPdoBuffered()->prepare($query);
+			$statement->execute($parameter);
+			return $statement;
 		}
+	}
+
+	/**
+	 * @param \PDOStatement $statement
+	 * @param int $mode
+	 *
+	 * @return mixed
+	 */
+	public function fetch(
+		\PDOStatement $statement,
+		int $mode = \PDO::FETCH_ASSOC
+	) {
+		return $statement->fetch($mode);
 	}
 
 	/**

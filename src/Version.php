@@ -223,26 +223,33 @@ class Version
 				[]
 			);
 
-			$resultTable     = $this->getDatabase()->query(
-				'SELECT * FROM ' . $table['Name'],
-				[]
-			);
 			$dumpDropTable   = "DROP TABLE IF EXISTS `" . $table['Name'] . "`";
 			$dumpCreateTable = $createTable[0]['Create Table'];
 
-			$resultCount = count($resultTable);
-			if (0 == $resultCount) {
+			$resultCount = $this->getDatabase()->query(
+				'SELECT COUNT(*) AS row_count FROM ' . $table['Name'],
+				[]
+			);
+			if (0 == $resultCount[0]['row_count']) {
 				continue;
 			}
 
+			$resultTable = $this->getDatabase()->query(
+				'SELECT * FROM ' . $table['Name'],
+				[],
+				false
+			);
+
 			$insertTable = '';
 			$offset      = self::OFFSET;
-			foreach ($resultTable as $rowId => $row) {
+			$rowId = 0;
+			//foreach ($resultTable as $rowId => $row) {
+			while($row = $this->getDatabase()->fetch($resultTable)) {
 				if ('' == $insertTable) {
 					$insertTable = "INSERT INTO `"
 						. $table['Name']
 						. "` ("
-						. implode(', ', array_keys($resultTable[0]))
+						. implode(', ', array_keys($row))
 						. ") \nVALUES";
 				}
 				$insertTable .= "\n(";
@@ -279,6 +286,7 @@ class Version
 					$insertTable = '';
 					$offset      = self::OFFSET;
 				}
+				$rowId++;
 			}
 
 			$query = new Query(
@@ -343,9 +351,11 @@ class Version
 				[
 					':version' => $this->getVersion(),
 					':name'    => 'backup_%',
-				]
+				],
+				false
 			);
-			foreach ($backups as $backup) {
+			//foreach ($backups as $backup) {
+			while($backup = $this->getDatabase()->fetch($backups)) {
 				$startTime = microtime(true);
 				$status    = Query::STATUS_OK;
 				$message   = '';
