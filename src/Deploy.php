@@ -21,9 +21,9 @@ class Deploy
     /**
      * Constants
      */
-    const MODE_FAST = 'fast';
+    const MODE_FAST      = 'fast';
     const MODE_INTEGRITY = 'integrity';
-    const MODE_VALIDATE = 'validate';
+    const MODE_VALIDATE  = 'validate';
 
     /**
      * @var int
@@ -277,7 +277,7 @@ class Deploy
     protected function selectHighestPossibleVersion(): int
     {
         $highestPossibleVersion = 0;
-        $path = $this->getPath();
+        $path                   = $this->getPath();
         foreach (scandir($path) as $content) {
             if (!is_dir($path . '/' . $content)) {
                 continue;
@@ -372,11 +372,12 @@ class Deploy
     public function insertState(
         string $name,
         string $value
-    ) {
+    )
+    {
         $this->getDatabase()->query(
             'INSERT INTO dbv_state (name, value) VALUES(:name, :value) ON DUPLICATE KEY UPDATE value=VALUES(value)',
             [
-                ':name' => $name,
+                ':name'  => $name,
                 ':value' => $value,
             ]
         );
@@ -392,7 +393,8 @@ class Deploy
     public function deploy(
         int $deployVersion,
         string $mode
-    ): bool {
+    ): bool
+    {
         $startTime = microtime(true);
 
         if ($deployVersion < 0) {
@@ -449,7 +451,7 @@ class Deploy
                 echo('Executing postscript: "' . str_replace(__DIR__ . '/', '', $this->getPostScript()) . '" ' . "\n");
                 $stmts = $this->readStatementsFromFile();
 
-                foreach ($stmts as $stmt) {
+                foreach($stmts as $stmt) {
                     $this->getDatabase()->query(
                         $stmt,
                         []
@@ -576,7 +578,8 @@ class Deploy
     protected function deployHigherVersion(
         int $deployVersion,
         string $mode
-    ): bool {
+    ): bool
+    {
         /*if ($mode == self::MODE_FAST) {
             for ($executeVersion = $this->getCurrentVersion() + 2; $executeVersion <= $deployVersion; $executeVersion++)
             {
@@ -623,12 +626,10 @@ class Deploy
                     $stmts[] = $stmt;
                     $stmt = "";
                 }
+            } else if (preg_match("/^#/", $line)) {
+                continue;
             } else {
-                if (preg_match("/^#/", $line)) {
-                    continue;
-                } else {
-                    $stmt .= " " . trim($line);
-                }
+                $stmt .= " " . $line;
             }
         }
         return $stmts;
