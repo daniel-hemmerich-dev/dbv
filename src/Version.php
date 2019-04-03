@@ -43,11 +43,14 @@ class Version
 	 */
 	protected $queries = [];
 
-	/**
-	 * Version constructor.
-	 *
-	 * @param int $version
-	 */
+    /**
+     * Version constructor.
+     *
+     * @param string $path
+     * @param int $version
+     * @param Database $database
+     * @throws \Exception
+     */
 	public function __construct(
 		string $path,
 		int $version,

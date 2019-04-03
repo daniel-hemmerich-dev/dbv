@@ -64,13 +64,13 @@ class Log
 		$this->database = $database;
 	}
 
-	/**
-	 * @param int $version
-	 * @param string $name
-	 * @param string $status
-	 * @param string $message
-	 * @param int $executionTime
-	 */
+    /**
+     * @param int $version
+     * @param string $name
+     * @param string $status
+     * @param string $message
+     * @param float $executionTime
+     */
 	public function insert(
 		int $version,
 		string $name,

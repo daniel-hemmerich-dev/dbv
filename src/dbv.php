@@ -20,7 +20,7 @@ try {
 	// setup
 	error_reporting(E_ALL);
 	ini_set('max_input_time', '1024');
-	set_time_limit(60 * 60 * 3);
+	set_time_limit(60 * 60 * 3); // 3 hours
 	date_default_timezone_set('Europe/Berlin');
 	ini_set('memory_limit', '1024M');
 	ignore_user_abort(true);
