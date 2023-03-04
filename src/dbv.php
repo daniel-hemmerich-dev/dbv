@@ -15,6 +15,9 @@
  * it first makes the changes on all copies and if no errors rename them at the end and delete the originals
  * in case of error delete the copies and keep the originals
  */
+
+use dbv\Deploy;
+
 $result = 0;
 try {
 	// setup
@@ -41,7 +44,7 @@ try {
 			$arg
 		)) {
 			$helpText = 'Usage: "php dbv.php {argument-name=argument-value}". '
-				. "\nThe following Arguments are supprted (case-insensitive):\n";
+				. "\nThe following Arguments are supported (case-insensitive):\n";
 			foreach ($validateParameter as $sKey => $validParameter) {
 				$helpText .= 'Name: ' . $sKey . "\n";
 				$helpText .= 'Values: ' . $validParameter['values'] . "\n";
@@ -91,13 +94,13 @@ try {
 
 // deploy
 	require_once __DIR__ . '/Deploy.php';
-	$deploy = new \dbv\Deploy(
+	$deploy = new Deploy(
 		$arguments['config']
 	);
 
 	if (!$deploy->deploy(
 		$arguments['version'] ?? $deploy->getHighestPossibleVersion(),
-		$arguments['mode'] ?? \dbv\Deploy::MODE_INTEGRITY
+		$arguments['mode'] ?? Deploy::MODE_INTEGRITY
 
 	)) {
 		throw new Exception('Deployment failed!');

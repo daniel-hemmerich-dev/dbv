@@ -8,6 +8,8 @@
 
 namespace dbv;
 
+use Exception;
+
 require_once __DIR__ . '/Database.php';
 
 /**
@@ -47,12 +49,15 @@ class Query
 	 */
 	protected $tables = [];
 
-	/**
-	 * Query constructor.
-	 *
-	 * @param Database $database
-	 * @param string $content
-	 */
+    /**
+     * Query constructor.
+     *
+     * @param Database $database
+     * @param int $version
+     * @param string $name
+     * @param string $content
+     * @throws Exception
+     */
 	public function __construct(
 		Database $database,
 		int $version,
@@ -74,7 +79,7 @@ class Query
 			$matches
 		);
 		if (!isset($matches[2]) || 0 == count($matches[2])) {
-			throw new \Exception('No Tables matched on "' . $this->getName() . '"');
+			throw new Exception('No Tables matched on "' . $this->getName() . '"');
 		}
 		$this->setTables($matches[2]);
 	}
@@ -129,7 +134,7 @@ class Query
 	/**
 	 * @return bool
 	 */
-	public function alreadyExecuted()
+	public function alreadyExecuted() : bool
 	{
 		try {
 			$result = $this->getDatabase()->query(
@@ -143,7 +148,7 @@ class Query
 			);
 
 			return 1 == $result[0]['already_exist'];
-		} catch (\Exception $exception) {
+		} catch (Exception $exception) {
 			if (false === strpos($exception, "dbv_queries' doesn't exist")
 				&& false === strpos($exception, "dbv_state' doesn't exist")) {
 				echo($exception);
@@ -169,7 +174,7 @@ class Query
 					':query'   => $this->getContent()
 				]
 			);
-		} catch (\Exception $exception) {
+		} catch (Exception $exception) {
 			if (false === strpos($exception, "dbv_queries' doesn't exist")) {
 				echo $exception;
 			}
@@ -198,7 +203,7 @@ class Query
 				//echo(' -> ' . self::STATUS_OK . "\n");
 				$this->insert();
 			}
-		} catch (\Exception $exception) {
+		} catch (Exception $exception) {
 			//echo(' -> ' . self::STATUS_FAILED . "\n");
 			echo($exception);
 			$status  = self::STATUS_FAILED;
@@ -216,17 +221,17 @@ class Query
 	}
 
 	/**
-	 * @return null
+	 * @return Database
 	 */
-	public function getDatabase()
+	public function getDatabase() : Database
 	{
 		return $this->database;
 	}
 
 	/**
-	 * @param null $database
+	 * @param Database $database
 	 */
-	public function setDatabase($database)//: void
+	public function setDatabase(Database $database)
 	{
 		$this->database = $database;
 	}

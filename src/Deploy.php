@@ -8,6 +8,8 @@
 
 namespace dbv;
 
+use Exception;
+
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/Version.php';
 
@@ -158,14 +160,15 @@ class Deploy
     /**
      * Deploy constructor.
      *
-     * @param string $config
+     * @param string $configPath
+     * @throws Exception
      */
     public function __construct(string $configPath)
     {
-        echo "Initializing {$configPath}...\n";
+        echo "Initializing $configPath...\n";
 
         if (!file_exists($configPath)) {
-            throw new \Exception('Config-File "' . $configPath . '" does not exit.');
+            throw new Exception('Config-File "' . $configPath . '" does not exit.');
         }
 
         $config = json_decode(
@@ -174,7 +177,7 @@ class Deploy
         );
 
         if (!$config) {
-            throw new \Exception('Invalid JSON in File: "' . $configPath . '".');
+            throw new Exception('Invalid JSON in File: "' . $configPath . '".');
         }
 
         if (!isset($config['database'])
@@ -183,7 +186,7 @@ class Deploy
             || !isset($config['database']['password'])
             || !isset($config['database']['database'])
             || !isset($config['database']['charset'])) {
-            throw new \Exception('No Database-Credentials specified in the Config-file.' . "\n");
+            throw new Exception('No Database-Credentials specified in the Config-file.' . "\n");
         }
         $database = new Database(
             Database::TYPE_MYSQL,
@@ -196,10 +199,10 @@ class Deploy
         $this->setDatabase($database);
 
         if (!isset($config['changes']) || !isset($config['changes']['src'])) {
-            throw new \Exception('No Source for Database-Changes specified in the Config-file.' . "\n");
+            throw new Exception('No Source for Database-Changes specified in the Config-file.' . "\n");
         }
         if (!is_dir(__DIR__ . '/' . $config['changes']['src'])) {
-            throw new \Exception(
+            throw new Exception(
                 'Source "' . __DIR__ . '/' . $config['changes']['src'] . '" for Database-Changes is invalid' . "\n"
             );
         }
@@ -211,8 +214,8 @@ class Deploy
                 '/^' . Version::PREFIX . '\d+$/i',
                 $dir
             )) {
-                throw new \Exception(
-                    'Foldername: "'
+                throw new Exception(
+                    'Folder name: "'
                     . $dir
                     . '" does not start with the prefix: "'
                     . Version::PREFIX
@@ -231,7 +234,7 @@ class Deploy
                 || !isset($synchronization['database']['password'])
                 || !isset($synchronization['database']['database'])
                 || !isset($synchronization['database']['charset'])) {
-                throw new \Exception('No Database-Credentials specified in the Config-file.' . "\n");
+                throw new Exception('No Database-Credentials specified in the Config-file.' . "\n");
             }
             $databaseSync = new Database(
                 Database::TYPE_MYSQL,
@@ -250,7 +253,7 @@ class Deploy
 
         if (isset($config['prescript'])) {
             if (!file_exists(__DIR__ . '/' . $config['prescript'])) {
-                throw new \Exception('Prescript-File: "' . $config['prescript'] . '" does not exist.' . "\n");
+                throw new Exception('Prescript-File: "' . $config['prescript'] . '" does not exist.' . "\n");
             }
             $this->getDatabase()->validateQuery(file_get_contents(__DIR__ . '/' . $config['prescript']));
             $this->setPreScript(__DIR__ . '/' . $config['prescript']);
@@ -258,7 +261,7 @@ class Deploy
 
         if (isset($config['postscript'])) {
             if (!file_exists(__DIR__ . '/' . $config['postscript'])) {
-                throw new \Exception('Postscript-File: "' . $config['postscript'] . '" does not exist.' . "\n");
+                throw new Exception('Postscript-File: "' . $config['postscript'] . '" does not exist.' . "\n");
             }
             $this->getDatabase()->validateQuery(file_get_contents(__DIR__ . '/' . $config['postscript']));
             $this->setPostScript(__DIR__ . '/' . $config['postscript']);
@@ -317,14 +320,14 @@ class Deploy
                 }
             }
             $this->setHighestPossibleVersion($this->selectHighestPossibleVersion());
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             /*
              * it must be the first-time the application is running
              * make a full backup of the database and add it to the v0-folder
              * execute the v0-folder queries
              * recursive-call of init
              */
-            echo('FirstTime initializiation.' . "\n");
+            echo('FirstTime initialization.' . "\n");
             $this->deploy(
                 0,
                 self::MODE_INTEGRITY
@@ -334,7 +337,7 @@ class Deploy
     }
 
     /**
-     * @return null
+     * @return Database
      */
     public function getDatabase(): Database
     {
@@ -342,7 +345,7 @@ class Deploy
     }
 
     /**
-     * @param null $database
+     * @param Database $database
      */
     public function setDatabase(Database $database)//: void
     {
@@ -350,17 +353,17 @@ class Deploy
     }
 
     /**
-     * @return null
+     * @return Database
      */
-    public function getDatabaseSync()
+    public function getDatabaseSync(): Database
     {
         return $this->databaseSync;
     }
 
     /**
-     * @param null $databaseSync
+     * @param Database $databaseSync
      */
-    public function setDatabaseSync($databaseSync)
+    public function setDatabaseSync(Database $databaseSync)
     {
         $this->databaseSync = $databaseSync;
     }
@@ -388,7 +391,7 @@ class Deploy
      * @param string $mode
      *
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     public function deploy(
         int $deployVersion,
@@ -398,11 +401,11 @@ class Deploy
         $startTime = microtime(true);
 
         if ($deployVersion < 0) {
-            throw new \Exception('Version can not be negative, but the value is "' . $deployVersion . '".');
+            throw new Exception('Version can not be negative, but the value is "' . $deployVersion . '".');
         }
 
         if ($deployVersion > $this->getHighestPossibleVersion()) {
-            throw new \Exception(
+            throw new Exception(
                 'Version can not be higher than the highest available version, but the value is "'
                 . $deployVersion
                 . '".'
@@ -533,7 +536,7 @@ class Deploy
      * @param int $deployVersion
      *
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     protected function deploySameVersion(int $deployVersion): bool
     {
@@ -550,7 +553,7 @@ class Deploy
      * @param int $deployVersion
      *
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     protected function deployLowerVersion(int $deployVersion): bool
     {
@@ -573,14 +576,14 @@ class Deploy
      * @param string $mode
      *
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     protected function deployHigherVersion(
         int $deployVersion,
         string $mode
     ): bool
     {
-        /*if ($mode == self::MODE_FAST) {
+        if ($mode == self::MODE_FAST) {
             for ($executeVersion = $this->getCurrentVersion() + 2; $executeVersion <= $deployVersion; $executeVersion++)
             {
                 $version = new Version(
@@ -596,7 +599,7 @@ class Deploy
             );
 
             return true;
-        }*/
+        }
 
         for ($executeVersion = $this->getCurrentVersion() + 1; $executeVersion <= $deployVersion; $executeVersion++) {
             $version = new Version(

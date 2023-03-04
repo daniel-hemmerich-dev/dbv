@@ -8,6 +8,12 @@
 
 namespace dbv;
 
+use Exception;
+use function ssh2_auth_pubkey_file;
+use function ssh2_connect;
+use function ssh2_disconnect;
+use function ssh2_tunnel;
+
 /**
  * Class SSH
  *
@@ -69,7 +75,7 @@ class SSH
 	 * @param string $tunnel_host
 	 * @param int $tunnel_port
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function __construct(
 		string $host,
@@ -82,7 +88,7 @@ class SSH
 		int $tunnel_port
 	)
 	{
-		$session = \ssh2_connect(
+		$session = ssh2_connect(
 			$host,
 			$port ?? 22,
 			[
@@ -91,29 +97,29 @@ class SSH
 		);
 
 		if (!$session) {
-			throw new \Exception('SSH Connection failed');
+			throw new Exception('SSH Connection failed');
 		}
 
-		if (!\ssh2_auth_pubkey_file(
+		if (!ssh2_auth_pubkey_file(
 			$session,
 			$user,
 			$public_key,
 			$private_key,
 			$password
 		)) {
-			throw new \Exception('Public Key Authentication Failed');
+			throw new Exception('Public Key Authentication Failed');
 		}
 
 		$this->setSession($session);
 
-		$tunnel_session = \ssh2_tunnel(
+		$tunnel_session = ssh2_tunnel(
 			$this->getSession(),
 			$tunnel_host,
 			$tunnel_port ?? 22
 		);
 
 		if (!$tunnel_session) {
-			throw new \Exception('SSH-Tunnel Connection failed');
+			throw new Exception('SSH-Tunnel Connection failed');
 		}
 
 		$this->setTunnel($tunnel_session);
@@ -124,7 +130,7 @@ class SSH
 	 */
 	public function __destruct()
 	{
-		\ssh2_disconnect($this->getTunnel());
-		\ssh2_disconnect($this->getSession());
+		ssh2_disconnect($this->getTunnel());
+		ssh2_disconnect($this->getSession());
 	}
 }

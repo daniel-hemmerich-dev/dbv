@@ -4,10 +4,10 @@
 	},
 	"database": {
 		"type": "mysql",
-		"host": "127.0.0.1",
+		"host": "DB_HOST",
 		"database": "",
-		"user": "root",
-		"password": "root",
+		"user": "DB_USER",
+		"password": "DB_PASSWORD",
 		"charset": "UTF8"
 	},
 	"postscript": "../data/reset.sql"

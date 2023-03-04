@@ -8,6 +8,8 @@
 
 namespace dbv;
 
+use Exception;
+
 /**
  * Class Log
  *
@@ -35,9 +37,9 @@ class Log
 	/**
 	 * @param Database $database
 	 *
-	 * @return Log|null
+	 * @return Log
 	 */
-	public static function instance(Database $database)
+	public static function instance(Database $database): Log
 	{
 		static $instance = null;
 
@@ -49,7 +51,7 @@ class Log
 	}
 
 	/**
-	 * @return null
+	 * @return Database
 	 */
 	public function getDatabase(): Database
 	{
@@ -57,7 +59,7 @@ class Log
 	}
 
 	/**
-	 * @param null $database
+	 * @param Database $database
 	 */
 	public function setDatabase(Database $database)//: void
 	{
@@ -96,7 +98,7 @@ class Log
 					),
 				]
 			);
-		} catch (\Exception $exception) {
+		} catch (Exception $exception) {
 			if (false === strpos($exception, "dbv_log' doesn't exist")) {
 				echo($exception);
 			}

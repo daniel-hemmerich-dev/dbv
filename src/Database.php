@@ -8,6 +8,10 @@
 
 namespace dbv;
 
+use Exception;
+use PDO;
+use PDOStatement;
+
 require_once __DIR__ . '/SSH.php';
 
 /**
@@ -97,13 +101,13 @@ class Database
 			$connection .= 'dbname=' . $this->getName() . ';';
 		}
 
-		$pdo = new \PDO(
+		$pdo = new PDO(
 			$connection, $this->getUser(), $this->getPassword(), [
-				\PDO::ATTR_ERRMODE          		=> \PDO::ERRMODE_EXCEPTION,
-				\PDO::ATTR_CASE             		=> \PDO::CASE_NATURAL,
-				\PDO::ATTR_ORACLE_NULLS     		=> \PDO::NULL_EMPTY_STRING,
-				\PDO::ATTR_EMULATE_PREPARES 		=> true,
-				\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY	=> true
+				PDO::ATTR_ERRMODE          		=> PDO::ERRMODE_EXCEPTION,
+				PDO::ATTR_CASE             		=> PDO::CASE_NATURAL,
+				PDO::ATTR_ORACLE_NULLS     		=> PDO::NULL_EMPTY_STRING,
+				PDO::ATTR_EMULATE_PREPARES 		=> true,
+				PDO::MYSQL_ATTR_USE_BUFFERED_QUERY	=> true
 			]
 		);
 		$this->setPdo($pdo);
@@ -112,13 +116,13 @@ class Database
 		$this->query('SET SESSION interactive_timeout = 28800', []);
 		$this->query('SET SESSION wait_timeout = 28800', []);
 
-		$pdo = new \PDO(
+		$pdo = new PDO(
 			$connection, $this->getUser(), $this->getPassword(), [
-				\PDO::ATTR_ERRMODE          		=> \PDO::ERRMODE_EXCEPTION,
-				\PDO::ATTR_CASE             		=> \PDO::CASE_NATURAL,
-				\PDO::ATTR_ORACLE_NULLS     		=> \PDO::NULL_EMPTY_STRING,
-				\PDO::ATTR_EMULATE_PREPARES 		=> true,
-				\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY	=> false
+				PDO::ATTR_ERRMODE          		=> PDO::ERRMODE_EXCEPTION,
+				PDO::ATTR_CASE             		=> PDO::CASE_NATURAL,
+				PDO::ATTR_ORACLE_NULLS     		=> PDO::NULL_EMPTY_STRING,
+				PDO::ATTR_EMULATE_PREPARES 		=> true,
+				PDO::MYSQL_ATTR_USE_BUFFERED_QUERY	=> false
 			]
 		);
 		$this->setPdoBuffered($pdo);
@@ -131,18 +135,18 @@ class Database
 		$this->setMaxAllowedPacked($result[0]['Value']);
 	}
 
-	/**
-	 * @return null
-	 */
-	public function getPdo(): \PDO
+    /**
+     * @return PDO
+     */
+	public function getPdo(): PDO
 	{
 		return $this->pdo;
 	}
 
-	/**
-	 * @param null $pdo
-	 */
-	public function setPdo(\PDO $pdo)//: void
+    /**
+     * @param PDO $pdo
+     */
+	public function setPdo(PDO $pdo)//: void
 	{
 		$this->pdo = $pdo;
 	}
@@ -269,7 +273,7 @@ class Database
 						'table'    => $table['table_name'],
 					]
 				);
-			} catch (\Exception $exception) {
+			} catch (Exception $exception) {
 				echo $exception;
 				continue;
 			}
@@ -301,7 +305,7 @@ class Database
 				true
 			);
 
-			// insert the intersect between the from and to tables
+			// insert the intersection between the from and to tables
 			foreach ($resultChunks as $chunk) {
 				$insertTable = "INSERT IGNORE INTO `"
 					. $table['table_name']
@@ -346,7 +350,7 @@ class Database
 	 * @param array $parameter
 	 * @param bool $fetch
 	 *
-	 * @return null
+	 * @return null|mixed
 	 */
 	public function query(
 		string $query,
@@ -358,9 +362,9 @@ class Database
 			$statement = $this->getPdo()->prepare($query);
 			$statement->execute($parameter);
 			try {
-				return $statement->fetchAll(\PDO::FETCH_ASSOC);
-			} catch (\Exception $exception) {
-				// non fetchable-statements
+				return $statement->fetchAll(PDO::FETCH_ASSOC);
+			} catch (Exception $exception) {
+				// non fetch able-statements
 				return null;
 			}
 		} else {
@@ -371,14 +375,14 @@ class Database
 	}
 
 	/**
-	 * @param \PDOStatement $statement
+	 * @param PDOStatement $statement
 	 * @param int $mode
 	 *
 	 * @return mixed
 	 */
 	public function fetch(
-		\PDOStatement $statement,
-		int $mode = \PDO::FETCH_ASSOC
+		PDOStatement $statement,
+		int $mode = PDO::FETCH_ASSOC
 	) {
 		return $statement->fetch($mode);
 	}

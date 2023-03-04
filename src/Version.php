@@ -8,6 +8,8 @@
 
 namespace dbv;
 
+use Exception;
+
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/Query.php';
 require_once __DIR__ . '/Log.php';
@@ -49,7 +51,7 @@ class Version
      * @param string $path
      * @param int $version
      * @param Database $database
-     * @throws \Exception
+     * @throws Exception
      */
 	public function __construct(
 		string $path,
@@ -75,7 +77,7 @@ class Version
 				$queryFile,
 				$matches
 			)) {
-				throw new \Exception(
+				throw new Exception(
 					'File: "'
 					. $queryFile
 					. '" does not match the requirements. Prefix must be: "'
@@ -85,7 +87,7 @@ class Version
 				);
 			}
 			if (isset($this->queries[$matches[1]])) {
-				throw new \Exception(
+				throw new Exception(
 					'A query with the same id "'
 					. $matches[1]
 					. '"from file "'
@@ -106,7 +108,7 @@ class Version
 	/**
 	 * @return string
 	 */
-	protected function getFullpath()
+	protected function getFullpath() : string
 	{
 		return $this->getPath() . self::PREFIX . $this->getVersion() . '/';
 	}
@@ -152,7 +154,7 @@ class Version
 			if (0 != $this->getVersion()) {
 				$this->backup();
 			}
-		} catch (\Exception $exception) {
+		} catch (Exception $exception) {
 			echo($exception);
 
 			return false;
@@ -161,12 +163,12 @@ class Version
 		try {
 			foreach ($this->getQueries() as $query) {
 				if (!$query->execute()) {
-					throw new \Exception("Error during query-execution:\n{$query->getContent()}.\n");
+					throw new Exception("Error during query-execution:\n{$query->getContent()}.\n");
 				}
 			}
 
 			return true;
-		} catch (\Exception $exception) {
+		} catch (Exception $exception) {
 			echo $exception;
 			$this->rollback();
 
@@ -174,10 +176,11 @@ class Version
 		}
 	}
 
-	/**
-	 * check which changes needs to be executed if it is the current-version, else execute all queries
-	 * backup them, add them to the backup-file-name, so it is clear which queries the backup contains
-	 */
+    /**
+     * check which changes needs to be executed if it is the current-version, else execute all queries
+     * backup them, add them to the backup-file-name, so it is clear which queries the backup contains
+     * @throws Exception
+     */
 	protected function backup()
 	{
 		// add the tables of unexecuted scripts to the backup-table
@@ -197,7 +200,7 @@ class Version
 	/**
 	 * @param array $tableWhitelist
 	 *
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	protected function dump(array $tableWhitelist)
 	{
@@ -367,7 +370,7 @@ class Version
 						$backup['query'],
 						[]
 					);
-				} catch (\Exception $exception) {
+				} catch (Exception $exception) {
 					echo($exception);
 					$status  = Query::STATUS_FAILED;
 					$message = (string)$exception;
@@ -382,7 +385,7 @@ class Version
 			}
 
 			return true;
-		} catch (\Exception $exception) {
+		} catch (Exception $exception) {
 			echo($exception);
 
 			return false;
